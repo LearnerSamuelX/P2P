@@ -15,6 +15,7 @@
     "ejs": "^3.1.2",
     "express": "^4.17.1",
     "express-ejs-layouts": "^2.5.0",
+    "init": "^0.1.2",
     "pg": "^8.0.3"
   },
   "devDependencies": {

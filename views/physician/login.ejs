@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Physician Registration/Login</title>
+</head>
+
+<body>
+    <h1>Doctor</h1>
+    <p>Registration</p>
+    <!--physician route-->
+    <form method='POST'action="/physician/loggedin">
+        <label>Username:</label>
+        <input type="text" id="user_name" name='user_name'>
+        <label>Create your password:</label>
+        <input type="text" id='password_1' name='password_1'>
+        <label>Confirm your password:</label>
+        <input type="text" id='password_2' name='password_2'>
+        <button type="submit">Register</button>
+    </form>
+    
+    <!--R: Complete front end code which will ensure the two sets of password input match-->
+    <script src="../../public/doclogin.js"></script>
+</body>
+
+</html>
