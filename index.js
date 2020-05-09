@@ -2,10 +2,7 @@ const express = require('express')
 const bodyParser = require('body-parser')
 const app = express()
 const port = 3000
-// const routes = require('./routes/query')
 
-//PostGreSQL setup
-const Pool = require('pg').Pool
 //using pool for connection, not connect
 
 const mainRouter = require('./routes/main')

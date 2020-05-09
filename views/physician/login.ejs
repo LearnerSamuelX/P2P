@@ -10,7 +10,7 @@
     <h1>Doctor</h1>
     <p>Registration</p>
     <!--physician route-->
-    <form method='POST'action="/physician/loggedin">
+    <form method='POST'onsubmit="return formValidation()"action="/physician/loggedin">
         <label>Username:</label>
         <input type="text" id="user_name" name='user_name'>
         <label>Create your password:</label>
