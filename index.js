@@ -7,13 +7,7 @@ const port = 3000
 //PostGreSQL setup
 const Pool = require('pg').Pool
 //using pool for connection, not connect
-const pool = new Pool({
-  user: 'postgre',
-  host: 'localhost',
-  database: 'p2p',
-  password: 'Gogo11!5',
-  port: 5432,
-})
+
 const mainRouter = require('./routes/main')
 const docRouter = require('./routes/physician') //to physician.js
 
