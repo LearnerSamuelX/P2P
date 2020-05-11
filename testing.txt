@@ -1,0 +1,7 @@
+//just for the sake of simplying the testing process
+username: king_samuel,
+email: sam123@bj.com,
+firstname: zhuoxiang,
+lastname:xie,
+creat a password: 12345
+confirm your password: 12345

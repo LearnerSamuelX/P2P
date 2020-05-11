@@ -8,9 +8,9 @@
 
 <body>
     <h1>Doctor</h1>
-    <p>Registration</p>
     <!--physician route-->
     <div id="doc_reg">
+        <h3>Registration</h3>
         <form method='POST'onsubmit="return formValidation()"action="/physician/loggedin">
             <label>Username:</label>
             <input type="text" id="user_name" name="user_name">
@@ -25,6 +25,17 @@
             <label>Confirm your password:</label>
             <input type="text" id='password_2' name='password_2'>
             <button type="submit">Register</button>
+        </form>
+    </div>
+
+    <div id="doc_login">
+    <h3>Login</h3>
+        <form method='GET'action="/physician/loggedin">
+            <label>Username:</label>
+            <input type='text'id='user_name_login'name='user_name_login'>
+            <label>Password:</label>
+            <input type='text'id='password_login'name='password_login'>
+            <button type="submit">Login</button>
         </form>
     </div>
     

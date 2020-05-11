@@ -16,18 +16,61 @@ router.get('/',(req,res)=>{
 
 //table: doc_reg, 
 router.post('/loggedin',(req,res)=>{
-    const {user_name, user_email, first_name, last_name, pw_1}=req.body
-    pool.query('INSERT INTO doc_reg (username,pw,firstname,lastname,email) VALUES ($1,$2,$3,$4,$5,$6)'
-    ,[user_name,user_email, first_name, last_name, pw_1],(err, results)=>{
+    const {user_name, password_1, first_name, last_name,user_email}=req.body
+    const dbsearch_text='SELECT * FROM doc_reg WHERE username = $1'
+    const dbsearch_value=[user_name]
+    //ensure the input for user_name is unique as it is the primary key for the table
+    pool.query(dbsearch_text,dbsearch_value,(err,results)=>{
+        if (err){
+            console.log(err)
+        }else{
+            const unique_check = results.rows[0]
+            //when not equal to undefined, it means the username has been taken
+            if (unique_check!==undefined){
+                res.send("Username Taken, Pick Another One")
+            }
+            else{
+                pool.query('INSERT INTO doc_reg (username,pw,firstname,lastname,email) VALUES ($1,$2,$3,$4,$5)'
+                ,[user_name,password_1,first_name,last_name,user_email],(err, results)=>{
+                    if (err){
+                        console.log(err)
+                    }
+                    res.render('physician/loggedin',{
+                            firstname:first_name,
+                            lastname:last_name
+                            })
+                        })
+                }
+        }
+    })
+})
+
+//table doc_reg
+//the login search feature
+router.get('/loggedin',(req,res)=>{
+    const searchedun = req.query.user_name_login
+    const searchedpw = req.query.password_login
+
+    const dbsearch_text = 'SELECT * FROM doc_reg WHERE username=$1 AND pw=$2'
+    const dbsearch_value= [searchedun,searchedpw]
+    pool.query(dbsearch_text,dbsearch_value,(err,results)=>{
         if (err){
             console.log(err)
         }
-        res.render('physician/loggedin',{username:user_name})
+        const unique_check = results.rows[0]
+        if(unique_check===undefined){
+            res.send("You have not registered yet")
+        }else{
+            res.render('physician/loggedin',{
+                firstname:unique_check.firstname,
+                lastname:unique_check.lastname
+            })
+        }
     })
 })
 
 //table: doc_reg
-//search the table first to ensure the user has already registered
+//search the table first to ensure the user has already registered (testing)
 //unique key is username
 router.get('/loggedin/:search',(req,res)=>{
 
