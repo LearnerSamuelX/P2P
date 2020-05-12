@@ -57,22 +57,31 @@ router.get('/loggedin',(req,res)=>{
         if (err){
             console.log(err)
         }
-        const unique_check = results.rows[0]
-        if(unique_check===undefined){
+        const doc_info = results.rows[0]
+        if(doc_info===undefined){
             res.send("You have not registered yet")
         }else{
             res.render('physician/loggedin',{
-                firstname:unique_check.firstname,
-                lastname:unique_check.lastname
+                firstname:doc_info.firstname.toUpperCase(),
+                lastname:doc_info.lastname.toUpperCase()
             })
         }
     })
 })
 
+//patientlist table
+//a GET request, being directed to the page where a new patient can be created
+
+router.get('/loggedin/200/new_patient',(req,res)=>{
+    res.render('physician/newpatient')
+})
+
+
+//(TESTING)
 //table: doc_reg
-//search the table first to ensure the user has already registered (testing)
+//search the table first to ensure the user has already registered
 //unique key is username
-router.get('/loggedin/:search',(req,res)=>{
+router.get('/loggedin_search/:search',(req,res)=>{
 
     const username = req.params.search
     const dbun = 'SELECT * FROM doc_reg WHERE username = $1'
