@@ -12,4 +12,9 @@ function formValidation(){
         alert("Information Missing for Required Entries")
         return false
     }
+
+    else if (password_1!==password_2){
+        alert("Please make sure the passwords matched")
+        return false
+    }
 }

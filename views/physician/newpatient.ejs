@@ -8,7 +8,7 @@
 <body>
     <div>
         <h3>Creating a New Record</h3>
-        <form>
+        <form method='POST'action="physician/loggedin/200/new_patient/new_record">
             <p>Patient's Information</p>
             <label>First Name:</label>
             <input type='text'id="patientfirstname"name="patientfirstname">
@@ -17,7 +17,10 @@
             <label>Year of Birth:</label>
             <input type='text'id="patientage"name="patientage">
             <label>Create a User ID:</label>
-            <input type='text'id="patientid"name="patientid">
+            <input type='text'id="patientid_1"name="patientid_1">
+            <label>Confirm your User ID:</label>
+            <input type='text'id="patientid_2"name="patientid_2">
+            <button type='submit'>Create</button>
         </form>
     </div>
 </body>

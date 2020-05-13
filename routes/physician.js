@@ -14,7 +14,10 @@ router.get('/',(req,res)=>{
     res.render('physician/login')
 })
 
-//table: doc_reg, 
+let buffer_var='N/A';
+
+//table: doc_reg
+//for creating an account for doctor
 router.post('/loggedin',(req,res)=>{
     const {user_name, password_1, first_name, last_name,user_email}=req.body
     const dbsearch_text='SELECT * FROM doc_reg WHERE username = $1'
@@ -30,6 +33,11 @@ router.post('/loggedin',(req,res)=>{
                 res.send("Username Taken, Pick Another One")
             }
             else{
+                pool.query('INSERT INTO doc_pat_list (username) VALUES($1)',[user_name],(err)=>{
+                    if(err){
+                        console.log(err)
+                    }
+                })
                 pool.query('INSERT INTO doc_reg (username,pw,firstname,lastname,email) VALUES ($1,$2,$3,$4,$5)'
                 ,[user_name,password_1,first_name,last_name,user_email],(err, results)=>{
                     if (err){
@@ -71,9 +79,28 @@ router.get('/loggedin',(req,res)=>{
 
 //patientlist table
 //a GET request, being directed to the page where a new patient can be created
-
+//now, the challenge is how to pass phyisician's username into this page
 router.get('/loggedin/200/new_patient',(req,res)=>{
     res.render('physician/newpatient')
+    //select the variables you added in the pat_info_list from the pat_info_list database
+})
+
+router.post('loggedin/200/new_patient/new_record',(req,res)=>{
+    const {patientfirstname, patientlastname, patientage, patientid_1}=req.body
+    const dbcreate_text=
+    "INSERT INTO patient_list (patientfirstname, patientlastname, patientage, patientid_1) VALUE ($1, $2, $3, $4)"
+    const dbcreate_value=[patientfirstname, patientlastname, patientage, patientid_1]
+    pool.query(dbcreate_text,dbcreate_value,(err,results)=>{
+        if(err){
+            console.log(err)
+        }else{
+            res.render('physician/patient_menu',{
+                patientlastname:patientlastname,
+                patientfirstname:patientfirstname
+            })
+            //create the patient_list database first
+        }
+    })
 })
 
 
