@@ -33,11 +33,6 @@ router.post('/loggedin',(req,res)=>{
                 res.send("Username Taken, Pick Another One")
             }
             else{
-                pool.query('INSERT INTO doc_pat_list (username) VALUES($1)',[user_name],(err)=>{
-                    if(err){
-                        console.log(err)
-                    }
-                })
                 pool.query('INSERT INTO doc_reg (username,pw,firstname,lastname,email) VALUES ($1,$2,$3,$4,$5)'
                 ,[user_name,password_1,first_name,last_name,user_email],(err, results)=>{
                     if (err){
@@ -70,6 +65,7 @@ router.get('/loggedin',(req,res)=>{
             res.send("You have not registered yet")
         }else{
             res.render('physician/loggedin',{
+                docid:doc_info.username,
                 firstname:doc_info.firstname.toUpperCase(),
                 lastname:doc_info.lastname.toUpperCase()
             })
@@ -80,24 +76,48 @@ router.get('/loggedin',(req,res)=>{
 //patientlist table
 //a GET request, being directed to the page where a new patient can be created
 //now, the challenge is how to pass phyisician's username into this page
-router.get('/loggedin/200/new_patient',(req,res)=>{
-    res.render('physician/newpatient')
+router.get('/loggedin/200/:docid',(req,res)=>{
+    const docid = req.params.docid
     //select the variables you added in the pat_info_list from the pat_info_list database
+    const copiedtext = 'SELECT * FROM doc_pat_list WHERE username = $1'
+    const copiedvalue = [docid]
+
+    pool.query('INSERT INTO doc_pat_list (username) VALUES($1)',[docid],(err)=>{
+        if(err){
+            console.log(err)
+        }
+    })
+
+    pool.query(copiedtext,copiedvalue,(err,results)=>{
+        if(err){
+            console.log(err)
+        }else{
+            // console.log(results.rows[0])
+            res.render('physician/newpatient',{doc_id:docid})
+        }
+    })
 })
 
-router.post('loggedin/200/new_patient/new_record',(req,res)=>{
+router.post('/loggedin/200/:docid/new_record',(req,res)=>{
+    const doc_id = req.params.docid
     const {patientfirstname, patientlastname, patientage, patientid_1}=req.body
     const dbcreate_text=
-    "INSERT INTO patient_list (patientfirstname, patientlastname, patientage, patientid_1) VALUE ($1, $2, $3, $4)"
+    "INSERT INTO pat_info (patient_firstname, patient_lastname, patient_age, patient_id) VALUES ($1, $2, $3, $4)"
     const dbcreate_value=[patientfirstname, patientlastname, patientage, patientid_1]
+
+    pool.query("INSERT INTO doc_pat_list (patient_id) VALUES ($1)",[patientid_1],(err,results)=>{
+        if (err){
+            console.log(err)
+        }
+        console.log(results)
+    })
+
     pool.query(dbcreate_text,dbcreate_value,(err,results)=>{
         if(err){
             console.log(err)
         }else{
-            res.render('physician/patient_menu',{
-                patientlastname:patientlastname,
-                patientfirstname:patientfirstname
-            })
+            console.log(doc_id)
+            res.send("Testing")
             //create the patient_list database first
         }
     })
@@ -124,7 +144,7 @@ router.get('/loggedin_search/:search',(req,res)=>{
                 res.send("No Such Username Found in Database. ")
             }
             else{
-                res.render('physician/loggedin',{firstname:doc_info.firstname, lastname:doc_info.lastname}) //the 2 usernames here are different
+                res.render('physician/loggedin',{firstname:doc_info.firstname, lastname:doc_info.lastname, docid:doc_info.username}) //the 2 usernames here are different
             }
         }
     })

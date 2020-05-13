@@ -7,10 +7,10 @@
 </head>
 <body>
     <div id="doc-id">
-        <p>Dr. <%- lastname %>, <%- firstname %></p>
+        <p>Dr. <%= lastname %>, <%= firstname %></p>
     </div>
     <div id='new-patient'>
-        <a href="loggedin/200/new_patient">New Patient</a>
+        <a href="loggedin/200/<%=docid%>">New Patient</a>
     </div>
     <div id='existing-patients'>
 
