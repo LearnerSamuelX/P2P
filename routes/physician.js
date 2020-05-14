@@ -99,17 +99,17 @@ router.get('/loggedin/200/:docid',(req,res)=>{
 })
 
 router.post('/loggedin/200/:docid/new_record',(req,res)=>{
-    const doc_id = req.params.docid
+    const doc_id = req.params.docid //working
     const {patientfirstname, patientlastname, patientage, patientid_1}=req.body
     const dbcreate_text=
     "INSERT INTO pat_info (patient_firstname, patient_lastname, patient_age, patient_id) VALUES ($1, $2, $3, $4)"
     const dbcreate_value=[patientfirstname, patientlastname, patientage, patientid_1]
 
-    pool.query("INSERT INTO doc_pat_list (patient_id) VALUES ($1)",[patientid_1],(err,results)=>{
+    pool.query("UPDATE doc_pat_list SET patient_id=$1 WHERE username = $2",[dbcreate_value[3],doc_id],(err,results)=>{
         if (err){
             console.log(err)
         }
-        console.log(results)
+        console.log('doc_pat_list updated')
     })
 
     pool.query(dbcreate_text,dbcreate_value,(err,results)=>{
@@ -117,7 +117,7 @@ router.post('/loggedin/200/:docid/new_record',(req,res)=>{
             console.log(err)
         }else{
             console.log(doc_id)
-            res.send("Testing")
+            res.send("Inserted into pat_info")
             //create the patient_list database first
         }
     })
