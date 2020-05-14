@@ -105,20 +105,22 @@ router.post('/loggedin/200/:docid/new_record',(req,res)=>{
     "INSERT INTO pat_info (patient_firstname, patient_lastname, patient_age, patient_id) VALUES ($1, $2, $3, $4)"
     const dbcreate_value=[patientfirstname, patientlastname, patientage, patientid_1]
 
-    pool.query("UPDATE doc_pat_list SET patient_id=$1 WHERE username = $2",[dbcreate_value[3],doc_id],(err,results)=>{
-        if (err){
-            console.log(err)
-        }
-        console.log('doc_pat_list updated')
-    })
-
     pool.query(dbcreate_text,dbcreate_value,(err,results)=>{
         if(err){
             console.log(err)
         }else{
             console.log(doc_id)
-            res.send("Inserted into pat_info")
-            //create the patient_list database first
+        }
+    })
+
+    pool.query("UPDATE pat_info SET doc_id = $1 WHERE patient_id = $2",[doc_id,dbcreate_value[3]],(err,results)=>{
+        if(err){
+            console.log(err)
+        }else{
+            console.log(results)
+            res.render("physician/patient_menu",{
+                patientfirstname:patientfirstname,
+                patientlastname:patientlastname})
         }
     })
 })
