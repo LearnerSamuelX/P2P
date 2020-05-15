@@ -92,13 +92,12 @@ router.get('/loggedin/200/:docid',(req,res)=>{
         if(err){
             console.log(err)
         }else{
-            // console.log(results.rows[0])
             res.render('physician/newpatient',{doc_id:docid})
         }
     })
 })
 
-router.post('/loggedin/200/:docid/new_record',(req,res)=>{
+router.post('/loggedin/200/:docid/patients',(req,res)=>{
     const doc_id = req.params.docid //working
     const {patientfirstname, patientlastname, patientage, patientid_1}=req.body
     const dbcreate_text=
@@ -110,21 +109,58 @@ router.post('/loggedin/200/:docid/new_record',(req,res)=>{
             console.log(err)
         }else{
             console.log(doc_id)
-        }
-    })
-
-    pool.query("UPDATE pat_info SET doc_id = $1 WHERE patient_id = $2",[doc_id,dbcreate_value[3]],(err,results)=>{
-        if(err){
-            console.log(err)
-        }else{
-            console.log(results)
-            res.render("physician/patient_menu",{
-                patientfirstname:patientfirstname,
-                patientlastname:patientlastname})
+            pool.query("UPDATE pat_info SET doc_id = $1 WHERE patient_id = $2",[doc_id,dbcreate_value[3]],(err,results)=>{
+                if(err){
+                    console.log(err)
+                }else{
+                    console.log(results)
+                    res.render("physician/patmenu",{
+                        patientfirstname:patientfirstname,
+                        patientlastname:patientlastname})
+                }
+            })
         }
     })
 })
 
+//direct to patient search page when searching for existing patients
+router.get('/loggedin/200/patient_search/:docid',(req,res)=>{
+    const username=req.params.docid
+    const dbcommand = 'SELECT * FROM pat_info'
+    pool.query(dbcommand,(err,results)=>{
+        if(err){
+            console.log(err)
+        }else{
+            // console.log(results.rows) //will be shown once getting into extpatient page
+            res.render('physician/extpatient',{
+                doc_id:username
+            })
+        }
+    })
+})
+
+router.post('/loggedin/200/patient_search/:docid/patients_ii',(req,res)=>{
+    const username = req.params.docid
+    const {patient_lastname,patient_firstname,patient_id}= req.body
+    const dbcommand = 'SELECT * FROM pat_info WHERE patient_id=$1 AND patient_firstname=$2 AND patient_lastname=$3'
+    const dbvalue = [patient_id,patient_firstname,patient_lastname]
+    pool.query(dbcommand, dbvalue,(err,results)=>{
+        if(err){
+            console.log(err)
+        }else{
+            console.log(results.rows)
+            const pat_info = results.rows[0]
+            if(pat_info===undefined){
+                res.send("This patient is not in the database")
+            }else{
+                res.render('physician/patmenu',{
+                    patientlastname:patient_lastname,
+                    patientfirstname:patient_firstname,
+                })
+            }
+        }
+    })
+})
 
 //(TESTING)
 //table: doc_reg

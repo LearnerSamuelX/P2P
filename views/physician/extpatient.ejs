@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Patient List</title>
+    <link rel="stylesheet" href="/stylesheets/ext_patient.css">
+</head>
+<body>
+    <div id='search-panel'>
+        <!--Search Input (I know what you are trying to do here, but just leave the fanncy stuff to the end-->
+        <form method="POST"action="<%=doc_id%>/patients_ii">
+            <label>Patient's Last Name:</label>
+            <input type='text'id='patient_lastname'name='patient_lastname'>
+            <label>Patient's First Name:</label>
+            <input type='text'id='patient_firstname'name='patient_firstname'>
+            <label>Patient ID:</label>
+            <input type='text'id='patient_id'name='patient_id'>
+            <button type='submit'>Search</button>
+        </form>
+    </div>
+    <div id='recent-panel'>
+        <!--Down below display the list of existing patients-->
+    </div>
+    
+</body>
+</html>
