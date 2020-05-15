@@ -6,16 +6,20 @@
     <title>Menu</title>
 </head>
 <body>
+
     <div id='patient-info'>
-        <p>You are in <%- patientlastname  %>, <%- patientfirstname  %> 's portfolio</p>
+        <p>Patient Name : <%= patientfirstname  %><%= patientlastname  %></p>
+        <p>Patient Age: <%= patientage %></p>
     </div>
 
-    <div id='record-container'>
-        <h1>Record</h1>
-        <div id='record-column'>
-            Here will see the recent records, up to 5
-        </div>
+    <div id='selection'>
+        <a href="">Create a New Record</a><br>
+        <a href="">Existing Record Update & Follow-up</a>
     </div>
-    
+
+    <div id='diag-record'>
+
+    </div>
+
 </body>
 </html>

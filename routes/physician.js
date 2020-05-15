@@ -153,14 +153,18 @@ router.post('/loggedin/200/patient_search/:docid/patients_ii',(req,res)=>{
             if(pat_info===undefined){
                 res.send("This patient is not in the database")
             }else{
+                let age = new Date().getFullYear()
                 res.render('physician/patmenu',{
-                    patientlastname:patient_lastname,
-                    patientfirstname:patient_firstname,
+                    patientlastname:pat_info.patient_lastname,
+                    patientfirstname:pat_info.patient_firstname,
+                    patientage:age-pat_info.patient_age
                 })
             }
         }
     })
 })
+
+//routes to creating / updating diagnosis 
 
 //(TESTING)
 //table: doc_reg
