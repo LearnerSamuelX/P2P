@@ -1,4 +1,4 @@
-function formValidation(){
+function registerValidation(){
     const user_name = document.getElementById('user_name').value
     const user_email = document.getElementById('user_email').value
     const first_name = document.getElementById('first_name').value
@@ -15,6 +15,16 @@ function formValidation(){
 
     else if (password_1!==password_2){
         alert("Please make sure the passwords matched")
+        return false
+    }
+}
+
+function loginValidation (){
+    const user_name = document.getElementById('user_name_login').value
+    const password = document.getElementById('password_login').value
+
+    if (user_name===""|| password===""){
+        alert("Login Information Missing")
         return false
     }
 }
