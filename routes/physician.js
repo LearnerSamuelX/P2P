@@ -14,8 +14,6 @@ router.get('/',(req,res)=>{
     res.render('physician/login')
 })
 
-let buffer_var='N/A';
-
 //table: doc_reg
 //for creating an account for doctor
 router.post('/loggedin',(req,res)=>{
@@ -139,11 +137,15 @@ router.get('/loggedin/200/patient_search/:docid',(req,res)=>{
     })
 })
 
-router.post('/loggedin/200/patient_search/:docid/patients_ii',(req,res)=>{
-    const username = req.params.docid
-    const {patient_lastname,patient_firstname,patient_id}= req.body
-    const dbcommand = 'SELECT * FROM pat_info WHERE patient_id=$1 AND patient_firstname=$2 AND patient_lastname=$3'
-    const dbvalue = [patient_id,patient_firstname,patient_lastname]
+
+router.get('/loggedin/200/patient_search/:docid/patients_ii',(req,res)=>{
+    const username = req.params.docid //just in case you might need doc's username later
+    const searchedln = req.query.patient_lastname
+    const searchedfn = req.query.patient_firstname
+    const searchedid = req.query.patient_id
+
+    const dbcommand = 'SELECT * FROM pat_info WHERE patient_id=$1 OR patient_firstname=$2 OR patient_lastname=$3'
+    const dbvalue = [searchedid,searchedfn,searchedln]
     pool.query(dbcommand, dbvalue,(err,results)=>{
         if(err){
             console.log(err)
@@ -164,7 +166,11 @@ router.post('/loggedin/200/patient_search/:docid/patients_ii',(req,res)=>{
     })
 })
 
-//routes to creating / updating diagnosis 
+//routes to creating or updating diagnosis (urologist)
+
+router.get('/loggedin/200/patient_search/:docid/patients_ii/newrecord',(req,res)=>{
+    res.render('physician/newrecord')
+})
 
 //(TESTING)
 //table: doc_reg

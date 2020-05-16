@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>New Patient Report</title>
+</head>
+<body>
+    <!--Create an inclue tag, so that you dont have to repetively create patient's name-->
+    <!--<%include %> Figure out this later--> 
+    <div id='date-time'>
+        <p id='date-time-text'></p>
+    </div>
+    <div id='form-container'>
+        <form>
+            <label>Category:</label>
+            <input type="text"id='record-category'name='record-category'><br>
+            <label>Urination Frequency (1-5):</label>
+            <input type="number"id='urnine-freq'name='urine-freq'><br>
+            <label>Urine Blood (0-3):</label>
+            <input type="number"id='urnine-blood'name='urine-blood'><br>
+            <label>Family History:</label>
+            <input type="text"id='fam-line'name='fam-line'><br>
+            <label>Latest PSA Index:</label>
+            <input type="number"id='psa-index'name='psa-index'><br>
+            <label>Other details with regard to the current symptom:</label>
+            <textarea id='dia-summary'name='dia-summary'></textarea>
+        </form>
+    </div>
+</body>
+</html>

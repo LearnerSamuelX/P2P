@@ -10,6 +10,7 @@ function registerValidation(){
 
     if (user_name==="" || user_email==="" || first_name==="" || last_name===""|| password_1===""|| password_2===""){
         alert("Information Missing for Required Entries")
+        console.log("1 Worked!")
         return false
     }
 
@@ -24,6 +25,7 @@ function loginValidation (){
     const password = document.getElementById('password_login').value
 
     if (user_name===""|| password===""){
+        console.log("2 Worked!")
         alert("Login Information Missing")
         return false
     }
