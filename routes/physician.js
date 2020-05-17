@@ -16,7 +16,7 @@ router.get('/',(req,res)=>{
 
 //table: doc_reg
 //for creating an account for doctor
-router.post('/loggedin',(req,res)=>{
+router.post('/accountcreated',(req,res)=>{
     const {user_name, password_1, first_name, last_name,user_email}=req.body
     const dbsearch_text='SELECT * FROM doc_reg WHERE username = $1'
     const dbsearch_value=[user_name]
@@ -37,6 +37,7 @@ router.post('/loggedin',(req,res)=>{
                         console.log(err)
                     }
                     res.render('physician/loggedin',{
+                            docid:user_name,
                             firstname:first_name,
                             lastname:last_name
                             })
@@ -47,13 +48,11 @@ router.post('/loggedin',(req,res)=>{
 })
 
 //table doc_reg
-//the login search feature
-router.get('/loggedin',(req,res)=>{
-    const searchedun = req.query.user_name_login
-    const searchedpw = req.query.password_login
-
+//the login search feature, change it to 'POST' request
+router.post('/loggedin',(req,res)=>{
+    const {user_name_login,password_login} = req.body
     const dbsearch_text = 'SELECT * FROM doc_reg WHERE username=$1 AND pw=$2'
-    const dbsearch_value= [searchedun,searchedpw]
+    const dbsearch_value= [user_name_login,password_login]
     pool.query(dbsearch_text,dbsearch_value,(err,results)=>{
         if (err){
             console.log(err)
