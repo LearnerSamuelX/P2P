@@ -14,6 +14,8 @@ router.get('/',(req,res)=>{
     res.render('physician/login')
 })
 
+let log_info = ''
+
 //table: doc_reg
 //for creating an account for doctor
 router.post('/accountcreated',(req,res)=>{
@@ -36,13 +38,17 @@ router.post('/accountcreated',(req,res)=>{
                     if (err){
                         console.log(err)
                     }
-                    res.render('physician/loggedin',{
+
+                log_info=user_name
+                console.log(log_info)
+
+                res.render('physician/loggedin',{
                             docid:user_name,
                             firstname:first_name,
                             lastname:last_name
-                            })
-                        })
-                }
+                    })
+                })
+            }
         }
     })
 })
@@ -61,6 +67,10 @@ router.post('/loggedin',(req,res)=>{
         if(doc_info===undefined){
             res.send("You have not registered yet")
         }else{
+
+            log_info=doc_info.username
+            console.log(log_info)
+
             res.render('physician/loggedin',{
                 docid:doc_info.username,
                 firstname:doc_info.firstname.toUpperCase(),
@@ -69,30 +79,37 @@ router.post('/loggedin',(req,res)=>{
         }
     })
 })
+/* COMPLETED */
 
 //patientlist table
-//a GET request, being directed to the page where a new patient can be created
-//now, the challenge is how to pass phyisician's username into this page
-router.get('/loggedin/200/:docid',(req,res)=>{
-    const docid = req.params.docid
+//a 'get' request, being directed to the page where a new patient can be created
+
+router.get('/loggedin/200/new_patient',(req,res)=>{
+    const docid = log_info
     //select the variables you added in the pat_info_list from the pat_info_list database
     const copiedtext = 'SELECT * FROM doc_pat_list WHERE username = $1'
     const copiedvalue = [docid]
 
-    pool.query('INSERT INTO doc_pat_list (username) VALUES($1)',[docid],(err)=>{
-        if(err){
-            console.log(err)
-        }
-    })
+    if (docid==""){
+        res.send("Please log into your account, thank you! ")
+    }else{
+        
+        pool.query('INSERT INTO doc_pat_list (username) VALUES($1)',[docid],(err)=>{
+            if(err){
+                console.log(err)
+            }
+        })
 
-    pool.query(copiedtext,copiedvalue,(err,results)=>{
-        if(err){
-            console.log(err)
-        }else{
-            res.render('physician/newpatient',{doc_id:docid})
-        }
-    })
+        pool.query(copiedtext,copiedvalue,(err,results)=>{
+            if(err){
+                console.log(err)
+            }else{
+                res.render('physician/newpatient',{doc_id:docid})
+            }
+        })
+    }
 })
+/* COMPLETED */
 
 router.post('/loggedin/200/:docid/patients',(req,res)=>{
     const doc_id = req.params.docid //working
@@ -121,19 +138,24 @@ router.post('/loggedin/200/:docid/patients',(req,res)=>{
 })
 
 //direct to patient search page when searching for existing patients
-router.get('/loggedin/200/patient_search/:docid',(req,res)=>{
-    const username=req.params.docid
+router.get('/loggedin/200/patient_search',(req,res)=>{
+    const username=log_info
     const dbcommand = 'SELECT * FROM pat_info'
-    pool.query(dbcommand,(err,results)=>{
-        if(err){
-            console.log(err)
-        }else{
-            // console.log(results.rows) //will be shown once getting into extpatient page
-            res.render('physician/extpatient',{
-                doc_id:username
-            })
-        }
-    })
+    if(username==""){
+        res.send("Please log into your account, thank you! ")
+    }else{
+
+        pool.query(dbcommand,(err,results)=>{
+            if(err){
+                console.log(err)
+            }else{
+                // console.log(results.rows) //will be shown once getting into extpatient page
+                res.render('physician/extpatient',{
+                    doc_id:username
+                })
+            }
+        })
+    }
 })
 
 
