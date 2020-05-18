@@ -10,11 +10,15 @@ const pool = new Pool({
     port: 5432,
   })
 
+//some global variables to prevent passing information such as pKey of datatables in URL
+let log_info = ''
+let patient_cursor = ''
+let patient_record_id = ''
+
+
 router.get('/',(req,res)=>{
     res.render('physician/login')
 })
-
-let log_info = ''
 
 //table: doc_reg
 //for creating an account for doctor
@@ -40,7 +44,6 @@ router.post('/accountcreated',(req,res)=>{
                     }
 
                 log_info=user_name
-                console.log(log_info)
 
                 res.render('physician/loggedin',{
                             docid:user_name,
@@ -69,7 +72,6 @@ router.post('/loggedin',(req,res)=>{
         }else{
 
             log_info=doc_info.username
-            console.log(log_info)
 
             res.render('physician/loggedin',{
                 docid:doc_info.username,
@@ -86,12 +88,11 @@ router.post('/loggedin',(req,res)=>{
 
 router.get('/loggedin/200/new_patient',(req,res)=>{
     const docid = log_info
-    //select the variables you added in the pat_info_list from the pat_info_list database
     const copiedtext = 'SELECT * FROM doc_pat_list WHERE username = $1'
     const copiedvalue = [docid]
 
     if (docid==""){
-        res.send("Please log into your account, thank you! ")
+        res.send("Please log into your account.")
     }else{
         
         pool.query('INSERT INTO doc_pat_list (username) VALUES($1)',[docid],(err)=>{
@@ -111,13 +112,12 @@ router.get('/loggedin/200/new_patient',(req,res)=>{
 })
 /* COMPLETED */
 
-router.post('/loggedin/200/:docid/patients',(req,res)=>{
-    const doc_id = req.params.docid //working
+router.post('/loggedin/200/new_patient/patient_info',(req,res)=>{
+    const doc_id = log_info //working
     const {patientfirstname, patientlastname, patientage, patientid_1}=req.body
     const dbcreate_text=
     "INSERT INTO pat_info (patient_firstname, patient_lastname, patient_age, patient_id) VALUES ($1, $2, $3, $4)"
     const dbcreate_value=[patientfirstname, patientlastname, patientage, patientid_1]
-
     pool.query(dbcreate_text,dbcreate_value,(err,results)=>{
         if(err){
             console.log(err)
@@ -157,25 +157,23 @@ router.get('/loggedin/200/patient_search',(req,res)=>{
         })
     }
 })
+/* COMPLETED */
 
-
-router.get('/loggedin/200/patient_search/:docid/patients_ii',(req,res)=>{
-    const username = req.params.docid //just in case you might need doc's username later
-    const searchedln = req.query.patient_lastname
-    const searchedfn = req.query.patient_firstname
-    const searchedid = req.query.patient_id
-
+router.post('/loggedin/200/patient_search/patients_ii',(req,res)=>{
+    const {patient_lastname,patient_firstname,patient_id}=req.body
     const dbcommand = 'SELECT * FROM pat_info WHERE patient_id=$1 OR patient_firstname=$2 OR patient_lastname=$3'
-    const dbvalue = [searchedid,searchedfn,searchedln]
+    const dbvalue = [patient_id,patient_firstname,patient_lastname]
     pool.query(dbcommand, dbvalue,(err,results)=>{
         if(err){
             console.log(err)
         }else{
-            console.log(results.rows)
+            // console.log(results.rows)
             const pat_info = results.rows[0]
             if(pat_info===undefined){
                 res.send("This patient is not in the database")
             }else{
+                patient_cursor = pat_info.patient_id
+                // console.log(patient_cursor)
                 let age = new Date().getFullYear()
                 res.render('physician/patmenu',{
                     patientlastname:pat_info.patient_lastname,
@@ -189,8 +187,22 @@ router.get('/loggedin/200/patient_search/:docid/patients_ii',(req,res)=>{
 
 //routes to creating or updating diagnosis (urologist)
 
-router.get('/loggedin/200/patient_search/:docid/patients_ii/newrecord',(req,res)=>{
-    res.render('physician/newrecord')
+router.get('/loggedin/200/patient_search/patients_ii/new_record',(req,res)=>{
+    // if(log_info===""||patient_cursor===""){
+    //     res.send("Please log into your account.")
+    // }else{
+        let record_id = new Date()
+        const a = record_id.getFullYear().toString()
+        const b = record_id.getMonth().toString()
+        const c = record_id.getDate().toString()
+        const d = record_id.getHours().toString()
+        const id_serie = a.concat(b).concat(c).concat(d)
+
+        console.log(id_serie)
+        res.render('physician/newrecord',{
+            record_id:id_serie
+        })
+    // }
 })
 
 //(TESTING)
