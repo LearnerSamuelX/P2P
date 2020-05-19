@@ -14,6 +14,7 @@ const pool = new Pool({
 let log_info = ''
 let patient_cursor = ''
 let patient_record_id = ''
+let age = new Date().getFullYear()
 
 
 router.get('/',(req,res)=>{
@@ -172,13 +173,12 @@ router.post('/loggedin/200/patient_search/patients_ii',(req,res)=>{
             if(pat_info===undefined){
                 res.send("This patient is not in the database")
             }else{
-                patient_cursor = pat_info.patient_id
+                patient_cursor = pat_info
                 // console.log(patient_cursor)
-                let age = new Date().getFullYear()
                 res.render('physician/patmenu',{
                     patientlastname:pat_info.patient_lastname,
                     patientfirstname:pat_info.patient_firstname,
-                    patientage:age-pat_info.patient_age
+                    patientage:age-patient_cursor.patient_age
                 })
             }
         }
@@ -188,21 +188,42 @@ router.post('/loggedin/200/patient_search/patients_ii',(req,res)=>{
 //routes to creating or updating diagnosis (urologist)
 
 router.get('/loggedin/200/patient_search/patients_ii/new_record',(req,res)=>{
-    // if(log_info===""||patient_cursor===""){
-    //     res.send("Please log into your account.")
-    // }else{
+    if(log_info===""||patient_cursor===""){
+        res.send("Please log into your account.")
+    }else{
         let record_id = new Date()
         const a = record_id.getFullYear().toString()
         const b = record_id.getMonth().toString()
         const c = record_id.getDate().toString()
         const d = record_id.getHours().toString()
-        const id_serie = a.concat(b).concat(c).concat(d)
+        const e = record_id.getMinutes().toString()
+        const id_serie = a.concat(b).concat(c).concat(d).concat(e)
 
         console.log(id_serie)
         res.render('physician/newrecord',{
             record_id:id_serie
         })
-    // }
+    }
+})
+
+router.post('/loggedin/200/patient_search/patients_ii/record_added',(req,res)=>{
+    //insert data into dia_info table
+    const {file_id,record_category,psa_index,urine_freq,urine_blood,fam_line,dia_summary}=req.body
+    const dbcommand = 
+    "INSERT INTO dia_info (record_id,category,psa,frequency,urine_blood,fam_history,symptom_summary) VALUES ($1,$2,$3,$4,$5,$6,$7)" 
+    const dbvalue = [file_id,record_category,psa_index,urine_freq,urine_blood,fam_line,dia_summary]
+    pool.query(dbcommand,dbvalue,(err,results)=>{
+        if(err){
+            console.log(err)
+        }else{
+            console.log(results)
+            res.render("physician/patmenu",{
+                patientfirstname:patient_cursor.patient_firstname,
+                patientlastname:patient_cursor.patient_lastname,
+                patientage:age-patient_cursor.patient_age
+            })
+        }
+    })
 })
 
 //(TESTING)
