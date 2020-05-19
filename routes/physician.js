@@ -1,4 +1,5 @@
 const express = require("express")
+const nodemailer = require('nodemailer');
 const router = express.Router()
 
 const Pool = require('pg').Pool
@@ -216,7 +217,31 @@ router.post('/loggedin/200/patient_search/patients_ii/record_added',(req,res)=>{
         if(err){
             console.log(err)
         }else{
-            console.log(results)
+            // console.log(results)
+            
+            let transporter = nodemailer.createTransport({
+                service: 'gmail',
+                auth: {
+                    user: 'samxiezx1115@gmail.com',
+                    pass: 'Gogo11!5'
+                  }
+            })
+
+            let mailOptions = {
+                from: 'samxiezx1115@gmail.com',
+                to: 'samxiezx1115@hotmail.com',
+                subject: `Physicians2Patients` ,
+                text: `A copy of the initial diagnosis has been sent to your account.\br Use your patient id number:${patient_cursor.patient_id}to register for online services.`
+              };
+
+            transporter.sendMail(mailOptions, function(error, info){
+                if (error) {
+                  console.log(error);
+                } else {
+                  console.log('Email sent: ' + info.response);
+                }
+              });
+
             res.render("physician/patmenu",{
                 patientfirstname:patient_cursor.patient_firstname,
                 patientlastname:patient_cursor.patient_lastname,
