@@ -12,10 +12,30 @@ const pool = new Pool({
   })
 
 //some global variables to prevent passing information such as pKey of datatables in URL
-let log_info = ''
-let patient_cursor = ''
-let patient_record_id = ''
-let age = new Date().getFullYear()
+//implement some OOP design here
+
+function Doctor(fn,ln,id){
+    this.login_status = 0
+    this.firstname=fn
+    this.lastname=ln
+    this.doc_id = id
+}
+
+function Patient(fn,ln,id,birthYear){
+    this.login_status = 0
+    this.firstname = fn
+    this.lastname = ln
+    this.age = new Date().getFullYear()-birthYear
+    this.patient_id = id
+}
+
+let doctor = ""
+let patient = ""
+let log_info =""
+// let patient_cursor = ''
+// let patient_record_id = ''
+
+// let year = new Date().getFullYear()
 
 
 router.get('/',(req,res)=>{
@@ -45,12 +65,13 @@ router.post('/accountcreated',(req,res)=>{
                         console.log(err)
                     }
 
-                log_info=user_name
+                doctor = new Doctor(first_name,last_name,user_name)
+                doctor.login_status = 1
 
                 res.render('physician/loggedin',{
-                            docid:user_name,
-                            firstname:first_name,
-                            lastname:last_name
+                            docid:doctor.doc_id,
+                            firstname:doctor.firstname,
+                            lastname:doctor.lastname
                     })
                 })
             }
@@ -72,13 +93,13 @@ router.post('/loggedin',(req,res)=>{
         if(doc_info===undefined){
             res.send("You have not registered yet")
         }else{
-
-            log_info=doc_info.username
+            
+            doctor = new Doctor (doc_info.firstname,doc_info.lastname,doc_info.doc_id)
 
             res.render('physician/loggedin',{
-                docid:doc_info.username,
-                firstname:doc_info.firstname.toUpperCase(),
-                lastname:doc_info.lastname.toUpperCase()
+                docid:doctor.doc_id,
+                firstname:doctor.firstname.toUpperCase(),
+                lastname:doctor.lastname.toUpperCase()
             })
         }
     })
@@ -89,15 +110,14 @@ router.post('/loggedin',(req,res)=>{
 //a 'get' request, being directed to the page where a new patient can be created
 
 router.get('/loggedin/200/new_patient',(req,res)=>{
-    const docid = log_info
     const copiedtext = 'SELECT * FROM doc_pat_list WHERE username = $1'
-    const copiedvalue = [docid]
+    const copiedvalue = [doctor.doc_id]
 
-    if (docid==""){
+    if (doctor==""){
         res.send("Please log into your account.")
     }else{
         
-        pool.query('INSERT INTO doc_pat_list (username) VALUES($1)',[docid],(err)=>{
+        pool.query('INSERT INTO doc_pat_list (username) VALUES($1)',[doctor.doc_id],(err)=>{
             if(err){
                 console.log(err)
             }
@@ -107,7 +127,7 @@ router.get('/loggedin/200/new_patient',(req,res)=>{
             if(err){
                 console.log(err)
             }else{
-                res.render('physician/newpatient',{doc_id:docid})
+                res.render('physician/newpatient',{doc_id:doctor.doc_id})
             }
         })
     }
@@ -130,9 +150,11 @@ router.post('/loggedin/200/new_patient/patient_info',(req,res)=>{
                     console.log(err)
                 }else{
                     console.log(results)
+
+                    patient = new Patient(patientfirstname,patientlastname,patientid_1,patientage)
                     res.render("physician/patmenu",{
-                        patientfirstname:patientfirstname,
-                        patientlastname:patientlastname})
+                        patientfirstname:patient.patientfirstname,
+                        patientlastname:patient.patientlastname})
                 }
             })
         }
@@ -141,7 +163,7 @@ router.post('/loggedin/200/new_patient/patient_info',(req,res)=>{
 
 //direct to patient search page when searching for existing patients
 router.get('/loggedin/200/patient_search',(req,res)=>{
-    const username=log_info
+    const username=doctor.doc_id
     const dbcommand = 'SELECT * FROM pat_info'
     if(username==""){
         res.send("Please log into your account, thank you! ")
@@ -174,12 +196,17 @@ router.post('/loggedin/200/patient_search/patients_ii',(req,res)=>{
             if(pat_info===undefined){
                 res.send("This patient is not in the database")
             }else{
-                patient_cursor = pat_info
+                patient = new Patient (
+                    pat_info.patient_firstname,
+                    pat_info.patient_lastname,
+                    pat_info.patient_id,
+                    pat_info.patient_age
+                )
                 // console.log(patient_cursor)
                 res.render('physician/patmenu',{
-                    patientlastname:pat_info.patient_lastname,
-                    patientfirstname:pat_info.patient_firstname,
-                    patientage:age-patient_cursor.patient_age
+                    patientlastname:patient.lastname,
+                    patientfirstname:patient.firstname,
+                    patientage:patient.age
                 })
             }
         }
@@ -189,9 +216,10 @@ router.post('/loggedin/200/patient_search/patients_ii',(req,res)=>{
 //routes to creating or updating diagnosis (urologist)
 
 router.get('/loggedin/200/patient_search/patients_ii/new_record',(req,res)=>{
-    if(log_info===""||patient_cursor===""){
+    if(doctor===""||patient===""){
         res.send("Please log into your account.")
     }else{
+
         let record_id = new Date()
         const a = record_id.getFullYear().toString()
         const b = record_id.getMonth().toString()
@@ -231,7 +259,7 @@ router.post('/loggedin/200/patient_search/patients_ii/record_added',(req,res)=>{
                 from: 'samxiezx1115@gmail.com',
                 to: 'samxiezx1115@hotmail.com',
                 subject: `Physicians2Patients` ,
-                text: `A copy of the initial diagnosis has been sent to your account.\br Use your patient id number:${patient_cursor.patient_id}to register for online services.`
+                text: `A copy of the initial diagnosis has been sent to your account.\br Use your patient id number:${patient.patient_id}to register for online services.`
               };
 
             transporter.sendMail(mailOptions, function(error, info){
@@ -243,9 +271,9 @@ router.post('/loggedin/200/patient_search/patients_ii/record_added',(req,res)=>{
               });
 
             res.render("physician/patmenu",{
-                patientfirstname:patient_cursor.patient_firstname,
-                patientlastname:patient_cursor.patient_lastname,
-                patientage:age-patient_cursor.patient_age
+                patientfirstname:patient.firstname,
+                patientlastname:patient.lastname,
+                patientage:patient.age
             })
         }
     })

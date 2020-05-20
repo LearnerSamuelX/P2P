@@ -15,6 +15,23 @@
                 psa.style.color = 'red'
             }
         }
+
+        //textera word count
+        var letter_count = document.getElementById('dia_summary').value.length
+        document.getElementById('dia_summary').addEventListener('keydown',()=>{
+            letter_count = 300 - letter_count
+        })
+
+        function wordLimit (){
+
+            var letter_count = document.getElementById('dia_summary').value.length
+            document.addEventListener('keydown',()=>{
+            var letter_left = 300 - letter_count
+                console.log(letter_left)
+            })
+            document.getElementById('word_count').innerHTML = letter_count.toString()
+        }
+
     </script>
 </head>
 <body>
@@ -40,8 +57,7 @@
             <input type="text"id='fam_line'name='fam_line'><br>
             <label>Other details with regard to the current symptom:</label>
             <textarea id='dia_summary'name='dia_summary'></textarea>
-
-            <!-- <p id='word-count'>300</p> -->
+            <p id='word_count'onchange=>300</p>
             <button type="submit">Create a Record</button>
         </form>
     </div>
