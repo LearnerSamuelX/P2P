@@ -183,6 +183,16 @@ router.get('/loggedin/200/patient_search',(req,res)=>{
 })
 /* COMPLETED */
 
+
+/*  */
+router.get('/loggedin/200/patient_search/patients_ii',(req,res)=>{
+    res.render('physician/patmenu',{
+        patientlastname:patient.lastname,
+        patientfirstname:patient.firstname,
+        patientage:patient.age
+    })
+})
+
 router.post('/loggedin/200/patient_search/patients_ii',(req,res)=>{
     const {patient_lastname,patient_firstname,patient_id}=req.body
     const dbcommand = 'SELECT * FROM pat_info WHERE patient_id=$1 OR patient_firstname=$2 OR patient_lastname=$3'
@@ -235,7 +245,7 @@ router.get('/loggedin/200/patient_search/patients_ii/new_record',(req,res)=>{
     }
 })
 
-router.post('/loggedin/200/patient_search/patients_ii/record_added',(req,res)=>{
+router.post('/loggedin/200/patient_search/diagnosiscreated',(req,res)=>{
     //insert data into dia_info table
     const {file_id,record_category,psa_index,urine_freq,urine_blood,fam_line,dia_summary}=req.body
     const dbcommand = 
@@ -270,11 +280,7 @@ router.post('/loggedin/200/patient_search/patients_ii/record_added',(req,res)=>{
                 }
               });
 
-            res.render("physician/patmenu",{
-                patientfirstname:patient.firstname,
-                patientlastname:patient.lastname,
-                patientage:patient.age
-            })
+            res.render("physician/success")
         }
     })
 })

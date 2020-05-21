@@ -16,22 +16,16 @@
             }
         }
 
-        //textera word count
-        var letter_count = document.getElementById('dia_summary').value.length
-        document.getElementById('dia_summary').addEventListener('keydown',()=>{
-            letter_count = 300 - letter_count
-        })
-
-        function wordLimit (){
-
-            var letter_count = document.getElementById('dia_summary').value.length
-            document.addEventListener('keydown',()=>{
-            var letter_left = 300 - letter_count
-                console.log(letter_left)
-            })
-            document.getElementById('word_count').innerHTML = letter_count.toString()
+        function characterLimit() {
+            var textEntered = document.getElementById('dia_summary').value
+            var characterCount = textEntered.length
+            var characterRemained = 300-characterCount
+            document.getElementById('word_count').innerHTML = characterRemained.toString()
         }
 
+
+        //textera word count
+        
     </script>
 </head>
 <body>
@@ -41,8 +35,7 @@
         <p id='date-time-text'></p>
     </div>
     <div id='form-container'>
-        <form method="POST"action="record_added">
-
+        <form method="POST"action="/physician/loggedin/200/patient_search/diagnosiscreated">
             <label>File ID:</label>
             <input type="text"id='file_id'name='file_id'value="<%=record_id%>"disabled>
             <label>Category:</label>
@@ -56,8 +49,8 @@
             <label>Family History:</label>
             <input type="text"id='fam_line'name='fam_line'><br>
             <label>Other details with regard to the current symptom:</label>
-            <textarea id='dia_summary'name='dia_summary'></textarea>
-            <p id='word_count'onchange=>300</p>
+            <textarea id='dia_summary'name='dia_summary'oninput='characterLimit()'></textarea>
+            <p id='word_count'>300</p>
             <button type="submit">Create a Record</button>
         </form>
     </div>
