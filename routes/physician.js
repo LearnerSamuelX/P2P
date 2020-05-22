@@ -153,8 +153,10 @@ router.post('/loggedin/200/new_patient/patient_info',(req,res)=>{
 
                     patient = new Patient(patientfirstname,patientlastname,patientid_1,patientage)
                     res.render("physician/patmenu",{
-                        patientfirstname:patient.patientfirstname,
-                        patientlastname:patient.patientlastname})
+                        patientfirstname:patient.firstname,
+                        patientlastname:patient.lastname,
+                        patientage:patient.age
+                    })
                 }
             })
         }
@@ -249,8 +251,8 @@ router.post('/loggedin/200/patient_search/diagnosiscreated',(req,res)=>{
     //insert data into dia_info table
     const {file_id,record_category,psa_index,urine_freq,urine_blood,fam_line,dia_summary}=req.body
     const dbcommand = 
-    "INSERT INTO dia_info (record_id,category,psa,frequency,urine_blood,fam_history,symptom_summary) VALUES ($1,$2,$3,$4,$5,$6,$7)" 
-    const dbvalue = [file_id,record_category,psa_index,urine_freq,urine_blood,fam_line,dia_summary]
+    "INSERT INTO dia_info (record_id,category,psa,frequency,urine_blood,fam_history,symptom_summary,patient_id) VALUES ($1,$2,$3,$4,$5,$6,$7,$8)" 
+    const dbvalue = [file_id,record_category.toUpperCase(),psa_index,urine_freq,urine_blood,fam_line,dia_summary,patient.patient_id]
     pool.query(dbcommand,dbvalue,(err,results)=>{
         if(err){
             console.log(err)
@@ -283,6 +285,11 @@ router.post('/loggedin/200/patient_search/diagnosiscreated',(req,res)=>{
             res.render("physician/success")
         }
     })
+})
+
+//existing record, so we call it history
+router.get('/loggedin/200/patient_search/patients_ii/history',(res,req)=>{
+    const dbcommand = 'SELECT * FROM'
 })
 
 //(TESTING)
