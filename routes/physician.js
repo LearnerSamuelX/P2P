@@ -167,10 +167,9 @@ router.post('/loggedin/200/new_patient/patient_info',(req,res)=>{
 router.get('/loggedin/200/patient_search',(req,res)=>{
     const username=doctor.doc_id
     const dbcommand = 'SELECT * FROM pat_info'
-    if(username==""){
+    if(doctor===""){
         res.send("Please log into your account, thank you! ")
     }else{
-
         pool.query(dbcommand,(err,results)=>{
             if(err){
                 console.log(err)
@@ -240,7 +239,7 @@ router.get('/loggedin/200/patient_search/patients_ii/new_record',(req,res)=>{
         const e = record_id.getMinutes().toString()
         const id_serie = a.concat(b).concat(c).concat(d).concat(e)
 
-        console.log(id_serie)
+        // console.log(id_serie)
         res.render('physician/newrecord',{
             record_id:id_serie
         })
@@ -258,6 +257,14 @@ router.post('/loggedin/200/patient_search/diagnosiscreated',(req,res)=>{
             console.log(err)
         }else{
             // console.log(results)
+
+            //create a Date object with date and time
+            let timer = new Date()
+            let reference_hour = timer.getHours()  //returns number type (0-23). Make 8:00 am the starting point
+            let reference_day = timer.getDate()
+            let scheduler = '* * * * * *' 
+            // '* 8,14,20 * * * *' three times a day
+            // '* 10,21 * * * *' two times a day
             
             let transporter = nodemailer.createTransport({
                 service: 'gmail',
@@ -288,8 +295,55 @@ router.post('/loggedin/200/patient_search/diagnosiscreated',(req,res)=>{
 })
 
 //existing record, so we call it history
-router.get('/loggedin/200/patient_search/patients_ii/history',(res,req)=>{
-    const dbcommand = 'SELECT * FROM'
+router.get('/loggedin/200/patient_search/patients_ii/history',(req,res)=>{
+    const dbcommand = 'SELECT * FROM dia_info WHERE patient_id = $1'
+    const dbvalue = [patient.patient_id]
+    pool.query(dbcommand,dbvalue,(err,results)=>{
+        if(err){
+            console.log(err)
+        }else{
+            const record = results.rows
+            if(patient.patient_id===""||doctor.doc_id===""){
+                res.send("Please log into the system")
+            }else{
+                if(record.length===0){
+                    res.send('No record saved on file for this patient')
+                }else{
+                    console.log(results.rows)
+                    res.render('physician/extrecord',{
+                        record:record
+                    })
+                }
+            }
+        }
+    })
+})
+
+router.get('/loggedin/200/patient_search/patients_ii/update/:record_id',(req,res)=>{
+    const record_id = req.params.record_id
+    const dbcommand = 'SELECT * FROM dia_info WHERE record_id = $1 AND patient_id=$2'
+    const dbvalue = [record_id,patient.patient_id]
+    pool.query(dbcommand,dbvalue,(err,results)=>{
+        if(err){
+            console.log(err)
+        }else{
+            const record = results.rows[0]
+            if(record===undefined){
+                res.send("Please log into the system")
+            }else{
+                console.log(record)
+                res.render('physician/update/update',{
+                    date:record.record_id,
+                    category:record.category,
+                    psa_index:record.psa,
+                    urine_freq:record.frequency,
+                    urine_blood:record.urine_blood,
+                    family_history:record.fam_history,
+                    other_info:record.symptom_summary
+                })
+            }
+        }
+    })
 })
 
 //(TESTING)

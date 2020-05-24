@@ -1,0 +1,14 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Past Records</title>
+</head>
+<body>
+    <!--  -->
+    <% record.forEach(i=>{ %>
+        <%= i.record_id %><a> View</a><a href="/physician/loggedin/200/patient_search/patients_ii/update/<%=i.record_id %>"> Update</a><br>
+    <% }) %>
+</body>
+</html>
