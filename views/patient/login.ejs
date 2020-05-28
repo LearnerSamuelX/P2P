@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login</title>
+</head>
+<body>
+    <div>
+        <h1>Patient Panel</h1>
+    </div>
+    <!-- create a new account using a new patient id -->
+    <div>
+        <h3>Create a New Account</h3>
+        <form method='POST'action='/patient/accountcreated'>
+            <label>User ID (Received in an email sent by your doctor):</label>
+            <input type='text' id='user_id'name='user_id'>
+            <label>Create a Password</label>
+            <input type='text' id='password_1'name='password_1'>
+            <button>Create</button>
+        </form>
+    </div>
+
+    <!-- log into an existing account -->
+    <div>
+        <h3>Log In</h3>
+        <form method='POST'action='/patient/loggedin'>
+            <label>User ID</label>
+            <input type='text' id='user_id_2'name='user_id_2'>
+            <label>Password:</label>
+            <input type='text' id='password'name='password'>
+            <button>Login</button>
+        </form>
+    </div>
+</body>
+</html>

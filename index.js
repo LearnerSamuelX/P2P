@@ -7,6 +7,7 @@ const port = 3000
 
 const mainRouter = require('./routes/main')
 const docRouter = require('./routes/physician') //to physician.js
+const patRouter = require('./routes/patient') //to patient.js
 
 //dotenv installed
 
@@ -21,6 +22,7 @@ app.set('layout','layouts/layout')
 
 app.use('/', mainRouter)
 app.use('/physician',docRouter)
+app.use('/patient',patRouter)
 
 app.listen(port, () => {
     console.log(`App running on port ${port}.`)
