@@ -83,5 +83,11 @@ router.post('/accountcreated',(req,res)=>{
 })
 
 
+//loggin route
+router.post('/loggedin',(req,res)=>{
+
+})
+
+
 
 module.exports=router
