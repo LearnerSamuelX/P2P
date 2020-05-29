@@ -8,3 +8,9 @@ application that can offer convenience for physicians' ability in giving diagnos
 don't need to go to doctors very frequently. 
 
 This app will be eventually extended to iOS and Android version. 
+
+(More to be updated)
+
+**License and Copyright** 
+
+**Zhuoxiang (Sam) Xie, <samxiezx1115@hotmail.com>**
