@@ -74,7 +74,7 @@ router.post('/accountcreated',(req,res)=>{
             console.log('account created!')
             // res.send('Success!')
             // res.json(patient)
-            res.render('patient/loggein')
+            res.render('patient/loggedin')
           }
         })
       }
@@ -85,7 +85,27 @@ router.post('/accountcreated',(req,res)=>{
 
 //loggin route
 router.post('/loggedin',(req,res)=>{
-
+  const user_id = req.body.user_id_2
+  let dbcommand = 'SELECT * FROM pat_info WHERE patient_id = $1'
+  let dbvalue = [user_id]
+  pool.query(dbcommand,dbvalue,(err,results)=>{
+    if(err){
+      console.log(err)
+    }else{
+      const patient_info = results.rows[0]
+      const patient = new Patient(patient_info.patient_firstname,patient_info.patient_lastname,patient_info.patient_id)
+      dbcommand = 'SELECT * FROM dia_info WHERE patient_id = $1'
+      dbvalue = [patient.patient_id]
+      pool.query(dbcommand,dbvalue,(err,results)=>{
+        if(err){
+          console.log(err)
+        }else{
+          console.log(results.rows)
+          res.render('patient/loggedin')
+        }
+      })
+    }
+  })
 })
 
 
