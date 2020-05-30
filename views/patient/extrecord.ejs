@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Existing Record</title>
+</head>
+<body>
+    <div id='record-container'>
+        <% record.forEach(i=>{ %>
+            <%= i.record_id %><a> View</a><a href="/patient/loggedin/existing_records/<%=i.record_id %>">Update</a><br>
+        <% }) %>
+    </div>
+</body>
+</html>

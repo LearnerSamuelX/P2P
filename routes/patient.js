@@ -18,7 +18,9 @@ class Patient {
     this.login_status = false
   }
 }
+let patient
 
+//open this when you have a record OPEN when update
 class Record {
   constructor(fn, ln, patient_id,record_id) {
     this.firstname = fn
@@ -61,7 +63,7 @@ router.post('/accountcreated',(req,res)=>{
       }else{
         console.log('User found and the account is being created')
 
-        const patient = new Patient(patient_info.patient_firstname,patient_info.patient_lastname,patient_info.patient_id)
+        patient = new Patient(patient_info.patient_firstname,patient_info.patient_lastname,patient_info.patient_id)
         patient.login_status = true
 
         dbcommand = 'UPDATE pat_info SET password = $1 WHERE patient_id = $2'
@@ -88,26 +90,65 @@ router.post('/loggedin',(req,res)=>{
   const user_id = req.body.user_id_2
   let dbcommand = 'SELECT * FROM pat_info WHERE patient_id = $1'
   let dbvalue = [user_id]
+  let patient_info 
   pool.query(dbcommand,dbvalue,(err,results)=>{
     if(err){
       console.log(err)
     }else{
-      const patient_info = results.rows[0]
-      const patient = new Patient(patient_info.patient_firstname,patient_info.patient_lastname,patient_info.patient_id)
-      dbcommand = 'SELECT * FROM dia_info WHERE patient_id = $1'
-      dbvalue = [patient.patient_id]
-      pool.query(dbcommand,dbvalue,(err,results)=>{
-        if(err){
-          console.log(err)
-        }else{
-          console.log(results.rows)
-          res.render('patient/loggedin')
-        }
+      patient_info = results.rows[0]
+      patient = new Patient(patient_info.patient_firstname,patient_info.patient_lastname,patient_info.patient_id)
+      patient.login_status = true
+      // res.json(patient)
+      res.render('patient/loggedin',{
+        firstname:patient.firstname,
+        lastname:patient.lastname
+      })
+      //truncate the part below and leave the trunacted to the view part
+      // dbcommand = 'SELECT * FROM dia_info WHERE patient_id = $1'
+      // dbvalue = [patient.patient_id]
+      // pool.query(dbcommand,dbvalue,(err,results)=>{
+      //   if(err){
+      //     console.log(err)
+      //   }else{
+      //     console.log(results.rows)
+      //     res.render('patient/loggedin')
+      //   }
+      // })
+    }
+  })
+})
+
+router.get('/loggedin/existing_records',(req,res)=>{
+  //pass patient.patient_id in here
+  const user_id = patient.patient_id
+  const dbcommand = 'SELECT * FROM dia_info WHERE patient_id = $1'
+  const dbvalue = [user_id]
+  pool.query(dbcommand,dbvalue,(err,results)=>{
+    if(err){
+      console.log(err)
+    }else{
+      const records=results.rows
+      // res.json(records)
+      res.render('patient/extrecord',{
+        record:records
       })
     }
   })
 })
 
+router.get('/loggedin/existing_records/:record_id',(req,res)=>{
+  const record_id = req.params.record_id
+  const dbcommand = 'SELECT * FROM dia_info WHERE record_id = $1'
+  const dbvalue = [record_id]
+  pool.query(dbcommand,dbvalue,(err,results)=>{
+    if(err){
+      console.log(err)
+    }else{
+      console.log(results.rows)
+      res.send('success')
+    }
+  })
+})
 
 
 module.exports=router
