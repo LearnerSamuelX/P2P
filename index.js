@@ -1,5 +1,6 @@
 const express = require('express')
 const bodyParser = require('body-parser')
+const explayout = require('express-ejs-layouts')
 const app = express()
 const port = 3000
 
@@ -15,6 +16,7 @@ const patRouter = require('./routes/patient') //to patient.js
 app.use(bodyParser.json())
 app.use(bodyParser.urlencoded({extended: true,})) 
 app.use(express.static('public'));
+app.use(explayout)
 
 app.set('view engine', 'ejs');
 app.set('views',__dirname + '/views')

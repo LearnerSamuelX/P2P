@@ -18,18 +18,11 @@ class Patient {
     this.login_status = false
   }
 }
-let patient
+let patient = ''
+let record = ''
+let date = ''
 
 //open this when you have a record OPEN when update
-class Record {
-  constructor(fn, ln, patient_id,record_id) {
-    this.firstname = fn
-    this.lastname = ln
-    this.patient_id = patient_id
-    this.record_id = record_id
-    this.login_status = false
-  }
-}
 
 class Doctor {
   constructor(fn, ln, doc_id) {
@@ -103,20 +96,27 @@ router.post('/loggedin',(req,res)=>{
         firstname:patient.firstname,
         lastname:patient.lastname
       })
-      //truncate the part below and leave the trunacted to the view part
-      // dbcommand = 'SELECT * FROM dia_info WHERE patient_id = $1'
-      // dbvalue = [patient.patient_id]
-      // pool.query(dbcommand,dbvalue,(err,results)=>{
-      //   if(err){
-      //     console.log(err)
-      //   }else{
-      //     console.log(results.rows)
-      //     res.render('patient/loggedin')
-      //   }
-      // })
     }
   })
 })
+
+router.get('/loggedin',async(req,res)=>{
+  if(patient===''){
+    res.send('Please log into the system')
+  }else{
+    res.render('patient/loggedin',{
+      firstname:patient.firstname,
+      lastname:patient.lastname
+    })
+    // try{
+    //   const dbcommand = 'SELECT * FROM pat_info WHERE patient_id = $1'
+    //   const dbvalue = [patient.patient_id]
+    //   const results = await pool.query(dbcommand,dbvalue)
+    //   res.render()
+    // }
+  }
+})
+
 
 router.get('/loggedin/existing_records',(req,res)=>{
   //pass patient.patient_id in here
@@ -144,10 +144,42 @@ router.get('/loggedin/existing_records/:record_id',(req,res)=>{
     if(err){
       console.log(err)
     }else{
-      console.log(results.rows)
-      res.send('success')
+      record= results.rows[0]
+      //maybe send an email to doctor once the send button is clicked
+      res.render('patient/update',{
+        date:record.record_id,
+        category:record.category,
+        psa_index:record.psa,
+        urine_freq:record.frequency,
+        urine_blood:record.urine_blood,
+        family_history:record.fam_history,
+        other_info:record.symptom_summary
+        
+      })
     }
   })
+})
+
+//post diagnosis message update
+router.post('/loggedin/existing_records/messageUpdated', async (req,res)=>{
+  const record_content = req.body.record_update
+
+  let month = (new Date().getMonth()+1).toString()
+  let day = new Date().getDate().toString()
+  let hour = new Date().getHours().toString()
+  let minute = new Date().getMinutes().toString()
+  let date = month.concat('/').concat(day).concat('/').concat(hour).concat('/').concat(minute)
+
+  const dbcommand = 'INSERT INTO post_info (date, msg_content, record_id, patient_id) VALUES ($1,$2,$3,$4)'
+  const dbvalue = [date,record_content,record.record_id,patient.patient_id]
+  
+  try{
+    const results = await pool.query(dbcommand,dbvalue)
+    // console.log(results.rows)
+    res.render('patient/success')
+  }catch(err){
+    console.log(err)
+  }
 })
 
 

@@ -1,0 +1,13 @@
+#diagnosis_summary {
+    border:2.5px solid rgb(0, 217, 255);
+}
+
+#prev_message {
+    margin-top: 2.5rem;
+    border:2.5px solid rgb(0, 255, 13);
+}
+
+#record_update {
+    margin-top: 2.5rem;
+    border:2.5px solid rgb(179, 179, 179);
+}

@@ -1,0 +1,22 @@
+#title-container{
+    text-align: center;
+    margin:12.5rem auto auto;
+    padding-bottom:2.5rem;
+    width:40rem;
+}
+
+#title-container a{
+    text-decoration: none;
+    font-size: 25px;
+    padding-left:1rem;
+    padding-right:1rem;
+    border:2px rgb(224, 224, 224) solid;
+    background-color:rgb(224, 224, 224);
+    color:black;
+}
+
+#title-container a:hover{
+    color:white;
+    border:2px rgb(65, 65, 65) solid;
+    background-color:rgb(65, 65, 65);
+}

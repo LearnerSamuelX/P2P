@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Patient Post Diagnosis Follow-Up</title>
-    <link rel="stylesheet" href="/stylesheets/physician/update/update.css">
+    <link rel="stylesheet" href="/stylesheets/patient/update/update.css">
 </head>
 <body>
     <!-- Summary of Diagnosis with Dark Blue Borders-->
@@ -22,11 +22,13 @@
         Message History<br>
         Ultimate goal: if no update received from patient, <br>
         then the text area for doctor should be in disabled mode
+        <!-- run a for loop inside the post_info database-->
         </p>
     </div>
+    
     <div id='record_update'>
-        <form id='record_msg'method='POST'action=''>
-            <textarea disabled></textarea>
+        <form method='POST'action='/patient/loggedin/existing_records/messageUpdated'>
+            <textarea id='record_update'name='record_update'></textarea>
             <button>Update</button>
         </form>
     </div>
