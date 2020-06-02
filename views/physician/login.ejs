@@ -4,7 +4,25 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Physician Registration/Login</title>
+    <link rel='stylesheet'href='/stylesheets/physician/login.css'>
     <script>
+    //character count to prevent over capacity input
+    //click on the input box --> count appears ; click somewhere else --> count disappears
+    //type in --> number goes down
+        function wordCount(){
+            let limit = 25;
+            const word_count = document.getElementById('user_name')
+            const word_length = word_count.value.length
+            word_count.addEventListener('keydown',()=>{
+                let count_text = document.querySelector('.word-count')
+                if(word_length===0){
+                    count_text.innerHTML = null
+                }else{
+                    count_text.innerHTML = (limit-word_length).toString()
+                }
+            })
+        }
+
         function registerValidation(){
             const user_name = document.getElementById('user_name').value
             const user_email = document.getElementById('user_email').value
@@ -41,39 +59,50 @@
 </head>
 
 <body>
+
     <h1>Doctor</h1>
     <!--physician route-->
-    <div id="doc_reg">
+    <div id='reg-log'>
+    <div id="doc-reg">
         <h3>Registration</h3>
-        <form method='POST'onsubmit="return registerValidation()"action="/physician/accountcreated">
-            <label>Username:</label>
-            <input type="text" id="user_name" name="user_name">
-            <label>Email:</label>
-            <input type="email" id="user_email" name="user_email">
-            <label>Type in First Name:</label>
-            <input type="text" id="first_name" name="first_name">
-            <label>Type in Last Name:</label>
-            <input type="text" id="last_name" name="last_name">
-            <label>Create your password:</label>
-            <input type="text" id='password_1' name='password_1'>
-            <label>Confirm your password:</label>
-            <input type="text" id='password_2' name='password_2'>
-            <button type="submit">Register</button>
-        </form>
+        <div class='form-container'>
+            <form class='fillin-form'method='POST'onsubmit="return registerValidation()"action="/physician/accountcreated">
+                
+                <label>Username:</label>
+                <p class='word-count'></p>
+                <input type="text" id="user_name"oninput='wordCount()'name="user_name">
+                
+
+                <label>Email:</label>
+                <input type="email" id="user_email"oninput='wordCount()'name="user_email">
+                <label>Type in First Name:</label>
+                <input type="text" id="first_name"oninput='wordCount()'name="first_name">
+                <label>Type in Last Name:</label>
+                <input type="text" id="last_name"oninput='wordCount()'name="last_name">
+                <label>Create your password:</label>
+                <input type="text" id='password_1'oninput='wordCount()'name='password_1'>
+                <label>Confirm your password:</label>
+                <input type="text" id='password_2'oninput='wordCount()'name='password_2'>
+                <button type="submit">Register</button>
+            </form>
+        </div>
     </div>
 
-    <div id="doc_login">
+    <div id="doc-login">
     <h3>Login</h3>
         <!--'POST' request, so that username and password aren't displayed in the URL-->
-        <form method='POST'onsubmit="return loginValidation()"action="/physician/loggedin">
-            <label>Username:</label>
-            <input type='text'id='user_name_login'name='user_name_login'>
-            <label>Password:</label>
-            <input type='text'id='password_login'name='password_login'>
-            <button type="submit">Login</button>
-        </form>
+        <div class='form-container'>
+            <form class='fillin-form' method='POST'onsubmit="return loginValidation()"action="/physician/loggedin">
+                <label>Username:</label>
+                <input type='text'id='user_name_login'name='user_name_login'>
+                <label>Password:</label>
+                <input type='text'id='password_login'name='password_login'>
+                <button type="submit">Login</button>
+            </form>
+        </div>
     </div>
     <!--R: Complete front end code which will ensure the two sets of password input match-->
+</div>
 </body>
 
 </html>

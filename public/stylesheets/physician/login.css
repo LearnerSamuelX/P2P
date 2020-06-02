@@ -1,0 +1,54 @@
+body h1{
+    text-align:center;
+}
+
+#reg-log{
+    display:flex;
+    flex-direction: row;
+}
+
+#doc-reg{
+    width:30rem;
+    margin-left:auto;
+    margin-right:auto;
+    background-color: rgb(132, 201, 241);
+}
+
+#doc-reg h3{
+    text-align: center;
+}
+
+.form-container{
+    width:20rem;
+    margin-left:auto;
+    margin-right:auto;
+    margin-bottom:2rem;
+}
+
+.fillin-form{
+    display:flex;
+    flex-direction:column;
+}
+
+.fillin-form input{
+    margin-bottom:1.5rem;
+}
+
+.fillin-form button{
+    margin-top:1rem;
+    margin-left:auto;
+    margin-right:auto;
+    width:10rem;
+}
+
+#doc-login{
+    width:30rem;
+    margin-left:auto;
+    margin-right:auto;
+    padding-bottom:2.5rem;
+    background-color: rgb(132, 201, 241);
+}
+
+#doc-login h3{
+    text-align:center;
+}

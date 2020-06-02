@@ -4,15 +4,14 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Physician</title>
+    <link rel='stylesheet'href='/stylesheets/physician/loggedin.css'>
 </head>
 <body>
     <div id="doc-id">
-        <p>Dr. <%= lastname %>, <%= firstname %></p>
+        <h3>Dr. <%= lastname %>, <%= firstname %></h3>
     </div>
-    <div id='new-patient'>
+    <div id='selection-container'>
         <a href="loggedin/200/new_patient">New Patient</a>
-    </div>
-    <div id='existing-patients'>
         <a href="loggedin/200/patient_search">Existing Patient</a>
     </div>
 
