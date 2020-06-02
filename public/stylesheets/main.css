@@ -1,22 +1,41 @@
 #title-container{
+
     text-align: center;
-    margin:12.5rem auto auto;
-    padding-bottom:2.5rem;
-    width:40rem;
+    background-color: rgb(132, 201, 241);
+    padding-top:2.5rem;
+    margin: 5rem auto 5rem auto;
+    width:30rem;
+    height:30rem;
+
 }
 
-#title-container a{
+#selection-bar{
+
+    display:flex;
+    flex-direction:column;
+    width:20rem;
+    margin-left:auto;
+    margin-right:auto;
+    margin-top:5rem;
+}
+
+#selection-bar a{
     text-decoration: none;
+    font-family: 'Roboto', sans-serif;
     font-size: 25px;
-    padding-left:1rem;
-    padding-right:1rem;
-    border:2px rgb(224, 224, 224) solid;
+    
+    width:10rem;
+    margin:2.5rem auto 2.5rem auto;
+
+    padding:1rem 1rem 1rem 1rem;
+
+    border:rgb(49, 49, 49) 2.5px solid;
     background-color:rgb(224, 224, 224);
     color:black;
 }
 
-#title-container a:hover{
+#selection-bar a:hover{
     color:white;
-    border:2px rgb(65, 65, 65) solid;
+    border:2px rgb(224, 224, 224) solid;
     background-color:rgb(65, 65, 65);
 }
