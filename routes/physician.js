@@ -93,9 +93,8 @@ router.post('/loggedin',(req,res)=>{
         if(doc_info===undefined){
             res.send("You have not registered yet")
         }else{
-            
-            doctor = new Doctor (doc_info.firstname,doc_info.lastname,doc_info.doc_id)
-
+            console.log(doc_info)
+            doctor = new Doctor (doc_info.firstname,doc_info.lastname,doc_info.username)
             res.render('physician/loggedin',{
                 docid:doctor.doc_id,
                 firstname:doctor.firstname.toUpperCase(),
@@ -225,7 +224,7 @@ router.post('/loggedin/200/patient_search/patients_ii',(req,res)=>{
 })
 
 //routes to creating or updating diagnosis (urologist)
-
+let id_serie = ''
 router.get('/loggedin/200/patient_search/patients_ii/new_record',(req,res)=>{
     if(doctor===""||patient===""){
         res.send("Please log into your account.")
@@ -237,7 +236,9 @@ router.get('/loggedin/200/patient_search/patients_ii/new_record',(req,res)=>{
         const c = record_id.getDate().toString()
         const d = record_id.getHours().toString()
         const e = record_id.getMinutes().toString()
-        const id_serie = a.concat(b).concat(c).concat(d).concat(e)
+        id_serie = a.concat(b).concat(c).concat(d).concat(e)
+        timeline = a.concat('/').concat(b).concat('/').concat(c).concat(' ').concat(d).concat(':').concat(e)
+
 
         // console.log(id_serie)
         res.render('physician/newrecord',{
@@ -248,10 +249,10 @@ router.get('/loggedin/200/patient_search/patients_ii/new_record',(req,res)=>{
 
 router.post('/loggedin/200/patient_search/diagnosiscreated',(req,res)=>{
     //insert data into dia_info table
-    const {file_id,record_category,psa_index,urine_freq,urine_blood,fam_line,dia_summary}=req.body
+    const {record_category,psa_index,urine_freq,urine_blood,fam_line,dia_summary}=req.body
     const dbcommand = 
     "INSERT INTO dia_info (record_id,category,psa,frequency,urine_blood,fam_history,symptom_summary,patient_id) VALUES ($1,$2,$3,$4,$5,$6,$7,$8)" 
-    const dbvalue = [file_id,record_category.toUpperCase(),psa_index,urine_freq,urine_blood,fam_line,dia_summary,patient.patient_id]
+    const dbvalue = [id_serie,record_category.toUpperCase(),psa_index,urine_freq,urine_blood,fam_line,dia_summary,patient.patient_id]
     pool.query(dbcommand,dbvalue,(err,results)=>{
         if(err){
             console.log(err)
@@ -309,7 +310,7 @@ router.get('/loggedin/200/patient_search/patients_ii/history',(req,res)=>{
                 if(record.length===0){
                     res.send('No record saved on file for this patient')
                 }else{
-                    console.log(results.rows)
+                    // console.log(results.rows)
                     res.render('physician/extrecord',{
                         record:record
                     })
@@ -319,31 +320,59 @@ router.get('/loggedin/200/patient_search/patients_ii/history',(req,res)=>{
     })
 })
 
-router.get('/loggedin/200/patient_search/patients_ii/update/:record_id',(req,res)=>{
-    const record_id = req.params.record_id
+let timeline = ''
+router.get('/loggedin/200/patient_search/patients_ii/update/:record_id',async (req,res)=>{
+    id_serie = req.params.record_id
+
+    //extract info from post_info database
+    const dbcommand_2 = 'SELECT * FROM post_info WHERE record_id = $1'
+    const dbvalue_2 = [id_serie]
+    const convo_result = await pool.query(dbcommand_2,dbvalue_2)
+    
+    const msg_display = convo_result.rows
+    console.log(msg_display)
+
     const dbcommand = 'SELECT * FROM dia_info WHERE record_id = $1 AND patient_id=$2'
-    const dbvalue = [record_id,patient.patient_id]
-    pool.query(dbcommand,dbvalue,(err,results)=>{
-        if(err){
-            console.log(err)
-        }else{
-            const record = results.rows[0]
-            if(record===undefined){
-                res.send("Please log into the system")
-            }else{
-                console.log(record)
-                res.render('physician/update/update',{
-                    date:record.record_id,
-                    category:record.category,
-                    psa_index:record.psa,
-                    urine_freq:record.frequency,
-                    urine_blood:record.urine_blood,
-                    family_history:record.fam_history,
-                    other_info:record.symptom_summary
-                })
-            }
-        }
-    })
+    const dbvalue = [id_serie,patient.patient_id]
+    const results = await pool.query(dbcommand,dbvalue)
+    const record = results.rows[0]
+    if(record===undefined){
+        res.send("Please log into the system")
+    }else{
+        // console.log(record) 
+        res.render('physician/update/update',{
+            record_id:record.record_id,
+            category:record.category,
+            psa_index:record.psa,
+            urine_freq:record.frequency,
+            urine_blood:record.urine_blood,
+            family_history:record.fam_history,
+            other_info:record.symptom_summary,
+            messages:msg_display
+        })
+    }
+})
+
+router.post('/loggedin/existing_records/messageUpdated',async(req,res)=>{
+    const record_content = req.body.record_update
+
+    let year = new Date().getFullYear.toString()
+    let month = (new Date().getMonth()+1).toString()
+    let day = new Date().getDate().toString()
+    let hour = new Date().getHours().toString()
+    let minute = new Date().getMinutes().toString()
+    let date = year.concat('/').concat(month).concat('/').concat(day).concat(' ').concat(hour).concat(':').concat(minute)
+
+    const dbcommand = 'INSERT INTO post_info (date, msg_content, record_id, doc_id) VALUES ($1,$2,$3,$4)'
+    const dbvalue = [date,record_content,id_serie,doctor.doc_id]
+
+    try{
+        const results = await pool.query(dbcommand,dbvalue)
+        // console.log(results.rows)
+        res.render('physician/success_1')
+    }catch(err){
+        console.log(err)
+    }
 })
 
 //(TESTING)

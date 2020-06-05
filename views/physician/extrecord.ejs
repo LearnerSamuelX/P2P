@@ -4,11 +4,16 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Past Records</title>
+    <link rel="stylesheet" href="/stylesheets/extrecord.css">
 </head>
 <body>
     <!--  -->
+    <div id='record-container'>
     <% record.forEach(i=>{ %>
-        <%= i.record_id %><a> View</a><a href="/physician/loggedin/200/patient_search/patients_ii/update/<%=i.record_id %>"> Update</a><br>
+        <div id='record-row'>
+            <a href="/physician/loggedin/200/patient_search/patients_ii/update/<%=i.record_id %>"><%= i.record_id %> View and Update</a><br>
+        </div>
     <% }) %>
+    </div>
 </body>
 </html>

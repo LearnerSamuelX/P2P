@@ -1,0 +1,50 @@
+#form-container {
+    width:40rem;
+    background-color: rgb(132, 201, 241);
+    padding-top:2.5rem;
+    padding-bottom:2.5rem;
+    margin-left:auto;
+    margin-right:auto;
+}
+
+#form-body{
+    display:flex;
+    flex-direction: column;
+}
+
+#file_id{
+    margin-left:12.5rem;
+    background-color: rgb(214, 214, 214);
+    border:rgb(59, 59, 59) 1px solid;
+    width:15rem;
+    font-weight:bolder;
+}
+
+#form-body input{
+    width:15rem;
+    margin-bottom:1rem;
+    margin-left:auto;
+    margin-right:auto;
+}
+
+#form-body label{
+    margin-left:12.5rem;
+}
+
+#form-body textarea{
+    width:15rem;
+    height:5rem;
+    margin-left:auto;
+    margin-right:auto;
+}
+
+#word_count{
+    text-align: center;
+}
+
+#form-body button{
+    width:10rem;
+    margin-left:auto;
+    margin-right:auto;
+}
+

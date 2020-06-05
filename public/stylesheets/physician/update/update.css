@@ -1,3 +1,52 @@
 #diagnosis_summary {
-    border:2.5px solid rgb(0, 217, 255);
+    border:10px solid rgb(132, 201, 241);
+    background-color: rgb(238, 238, 238);
+    width:20rem;
+    padding-left:2.5rem;
+    padding-right:2.5rem;
+    margin-left:auto;
+    margin-right:auto;
+    text-align: left;
+    font-weight:bold;
+}
+
+#prev_message{
+    width:20rem;
+    margin-top:2.5rem;
+    margin-bottom:2.5rem;
+    margin-left:auto;
+    margin-right:auto;
+    display:flex;
+    flex-direction: column;
+}
+
+#patient{
+    border:2.5px solid rgb(250, 164, 51);
+    margin-bottom:0.25rem;
+    
+}
+
+#doctor{
+    border:2.5px solid rgb(51, 160, 250);
+    margin-bottom:0.25rem;
+}
+
+#record_update{
+    width:25rem;
+    margin-left:auto;
+    margin-right:auto;
+}
+
+#record_update form{
+    display:flex;
+    flex-direction: column;
+}
+
+#record_update form textarea{
+    height:7.5rem;
+}
+
+#record_update form button{
+    width:5rem;
+    margin:0.5rem auto auto;
 }

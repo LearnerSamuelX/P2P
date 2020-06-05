@@ -1,0 +1,31 @@
+#record-container{
+    background-color: rgb(132, 201, 241);
+    border:black 2.5px solid;
+    width:40rem;
+    margin:2rem auto auto;
+    text-align: center;
+}
+
+#record-row {
+    padding-top:0.25rem;
+    padding-bottom:0.25rem;
+    background-color: white;
+    color:black;
+    width: 15rem;
+    margin-left:auto;
+    margin-right:auto;
+    margin-bottom:0.5rem;
+}
+
+#record-row a{
+    text-decoration: none;
+    color:black;
+}
+
+#record-row:hover {
+    background-color: rgb(58, 58, 58);
+}
+
+#record-row a:hover{
+    color:rgb(255, 255, 255);
+}

@@ -1,3 +1,31 @@
 #search-panel{
-    border:5px solid rgb(42, 167, 250);
+    border:5px solid rgb(132, 201, 241);
+    background-color: rgb(132, 201, 241);
+    width:20rem;
+    margin-top:1.5rem;
+    margin-left:auto;
+    margin-right:auto;
+    padding:1.5rem 1.5rem;
+}
+
+#search-form{
+    display:flex;
+    flex-direction: column;
+}
+
+#search-form label{
+    margin-left:2.5rem;
+}
+
+#search-form input{
+    width:15rem;
+    margin-left:auto;
+    margin-right:auto;
+    margin-bottom:0.5rem;
+}
+
+#search-form button{
+    width:10rem;
+    margin-left:auto;
+    margin-right:auto;
 }

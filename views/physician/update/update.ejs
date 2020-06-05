@@ -5,31 +5,48 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Patient Post Diagnosis Follow-Up</title>
     <link rel="stylesheet" href="/stylesheets/physician/update/update.css">
+    
 </head>
 <body>
     <!-- Summary of Diagnosis with Dark Blue Borders-->
     <div id='diagnosis_summary'>
-        <p>Date Created: <%=date %></p>
+        <p id='date-created'>Date Created: <%=record_id %></p>
         <p>Category: <%=category %></p>
-        <p>Latest PSA Index: <%=psa_index %></p>
+        <p>Latest PSA Index: <div id='psa-index'><%=psa_index %></div></p>
         <p>Urination Frequency (1-5): <%=urine_freq %></p>
         <p>Urine Blood (0-3): <%=urine_blood %></p>
         <p>Family History: <%=family_history %></p>
         <p>Other Information: <%=other_info %></p>
     </div>
     <div id='prev_message'>
-        <p>
-        Message History<br>
-        Ultimate goal: if no update received from patient, <br>
-        then the text area for doctor should be in disabled mode
-        </p>
+        <% messages.forEach(i=>{%>
+            <% if(i.patient_id!==null){ %>
+                <div id='patient'>
+                    <p><%=i.date%></p>
+                    <p>You: <%=i.msg_content%></p>
+                </div>
+            <%}else{ %>
+                <div id='doctor'>
+                    <p><%=i.date%></p>
+                    <p>Doctor: <%=i.msg_content%></p>
+                </div>
+            <%}%>
+        <%})%>
     </div>
     <div id='record_update'>
-        <form id='record_msg'method='POST'action=''>
-            <textarea disabled></textarea>
+        <form id='record_msg'method='POST'action='/physician/loggedin/existing_records/messageUpdated'>
+            <textarea id='record_update'name='record_update'></textarea>
             <button>Update</button>
         </form>
     </div>
-    
+    <script>
+        //psa index warning colour
+        const psa_content =  document.getElementById('psa-index').textContent
+        const psa_index = parseInt(psa_content)
+        if (psa_index>=4.2){
+            document.getElementById('psa-index').style.color='red'
+            document.getElementById('psa-index').style.fontWeight='bold'
+        }
+   </script>
 </body>
 </html>

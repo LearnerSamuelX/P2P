@@ -3,6 +3,7 @@
 }
 
 #prev_message {
+    border:2.5px,solid,rgb(15, 15, 15);
     margin-top: 2.5rem;
     border:2.5px solid rgb(0, 255, 13);
 }
