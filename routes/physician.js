@@ -320,7 +320,6 @@ router.get('/loggedin/200/patient_search/patients_ii/history',(req,res)=>{
     })
 })
 
-let timeline = ''
 router.get('/loggedin/200/patient_search/patients_ii/update/:record_id',async (req,res)=>{
     id_serie = req.params.record_id
 
@@ -356,7 +355,7 @@ router.get('/loggedin/200/patient_search/patients_ii/update/:record_id',async (r
 router.post('/loggedin/existing_records/messageUpdated',async(req,res)=>{
     const record_content = req.body.record_update
 
-    let year = new Date().getFullYear.toString()
+    let year = new Date().getFullYear().toString()
     let month = (new Date().getMonth()+1).toString()
     let day = new Date().getDate().toString()
     let hour = new Date().getHours().toString()
