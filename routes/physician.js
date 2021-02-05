@@ -1,53 +1,113 @@
-const express = require("express")
+const express = require("express");
 const nodemailer = require('nodemailer');
-const router = express.Router()
+let router = express.Router();
+const crypto = require('crypto');
+const crypto_salt = 'salt_rotation';
+const session = require('express-session');
+const {v4: uuidv4} = require("uuid"); 
 
-const Pool = require('pg').Pool
+const Pool = require('pg').Pool;
+
 const pool = new Pool({
     user: 'postgres',
-    host: 'localhost',
+    host: 'localhost', //will be changed for deployement 
     database: 'p2p',
-    password: 'Gogo11!5',
+    password: 'SAMEDWARDS',  //salt rotation
     port: 5432,
   })
 
-//some global variables to prevent passing information such as pKey of datatables in URL
-//implement some OOP design here
-
-function Doctor(fn,ln,id){
-    this.login_status = 0
-    this.firstname=fn
-    this.lastname=ln
-    this.doc_id = id
+async function session_validation(req,res,next){
+    // console.log(`Inside the middleware function. ${req.sessionID}`);
+    let validation_text = 'SELECT * FROM doc_reg WHERE session_id=$1';
+    let session_id = req.sessionID;
+    try{
+        let result_found = await pool.query(validation_text,[session_id]);
+        let user_found = result_found.rows[0];
+        if(user_found===undefined){
+            res.send('Session Expired, please relogin first.');
+        }
+        // console.log(user_found);
+        req.user_found = user_found;
+        next();
+    }catch(error){
+        console.log(error);
+        req.user_found = 'error'
+        res.send('Error at session_validation.')
+    }
 }
 
-function Patient(fn,ln,id,birthYear){
-    this.login_status = 0
-    this.firstname = fn
-    this.lastname = ln
-    this.age = new Date().getFullYear()-birthYear
-    this.patient_id = id
+async function pagination_validation(req,res,next){
+    console.log(`Inside the pagination_validation function. ${req.sessionID}`);
+    let doc_id = [req.user_found.username];
+    let found_doc_pat_list = 'SELECT * FROM doc_pat_list WHERE username = $1';
+    try{
+        let result_found = await pool.query(found_doc_pat_list,doc_id);
+        let patients_list  =result_found.rows;
+        req.patients_list = patients_list;
+        next();
+    }catch(error){
+        console.log(error);
+        res.send('Error at pagination_validation.');
+    }
 }
 
 let doctor = ""
 let patient = ""
-let log_info =""
-// let patient_cursor = ''
-// let patient_record_id = ''
 
-// let year = new Date().getFullYear()
+async function patient_unique_check (req,res,next){
+    //pass the patient_id into the function
+    let dbsearch_text = 'SELECT * FROM pat_info WHERE patient_id = $1';
+    let dbsearch_value = [req.body.patientid_1];
+    let result_found = await pool.query(dbsearch_text,dbsearch_value);
+    let patient_found = result_found.rows[0];
+    if(patient_found!==undefined){
+        res.render("physician/patmenu",{
+            patientfirstname:patient_found.patient_firstname,
+            patientlastname:patient_found.patient_lastname,
+            patientage:patient_found.birth_date
+        })
+    }else{
+        next();
+    }
+}
 
 
-router.get('/',(req,res)=>{
-    res.render('physician/login')
+router.use(session({
+    genid: function(req) {
+        return uuidv4() // use UUIDs for session IDs
+      },
+    name:'authorized_doctor',
+    //store: the default setting is storing the session id into memory
+    secret: 'dr.hartman', //rotate the secret that is used to generate session ID
+    resave: false, 
+    saveUninitialized: true,
+    cookie: {
+        maxAge: 1000*60*60,  //an hour 
+    },
+}))
+
+router.get('/',async (req,res)=>{
+    let session_id = req.sessionID;
+    let validation_text = 'SELECT * FROM doc_reg WHERE session_id=$1';
+    let result_found = await pool.query (validation_text,[session_id]);
+    const doc_info = result_found.rows[0];
+    if(doc_info!==undefined){
+        res.render('physician/loggedin',{
+            docid:doc_info.username,
+            firstname:doc_info.firstname.toUpperCase(),
+            lastname:doc_info.lastname.toUpperCase()
+        });
+    }else{
+        res.render('physician/login');
+    }
 })
 
-//table: doc_reg
 //for creating an account for doctor
-router.post('/accountcreated',(req,res)=>{
-    const {user_name, password_1, first_name, last_name,user_email}=req.body
+router.post('/accountcreated',async (req,res)=>{
+    const {user_name, password_1, first_name,last_name,user_email}=req.body
     const dbsearch_text='SELECT * FROM doc_reg WHERE username = $1'
     const dbsearch_value=[user_name]
+    const session_id = req.sessionID
     //ensure the input for user_name is unique as it is the primary key for the table
     pool.query(dbsearch_text,dbsearch_value,(err,results)=>{
         if (err){
@@ -59,20 +119,21 @@ router.post('/accountcreated',(req,res)=>{
                 res.send("Username Taken, Pick Another One")
             }
             else{
-                pool.query('INSERT INTO doc_reg (username,pw,firstname,lastname,email) VALUES ($1,$2,$3,$4,$5)'
-                ,[user_name,password_1,first_name,last_name,user_email],(err, results)=>{
-                    if (err){
-                        console.log(err)
+                let hashed_password = crypto.pbkdf2Sync(password_1, crypto_salt, 1000, 64, 'sha512').toString(`hex`);
+                pool.query('INSERT INTO doc_reg (username,password,firstname,lastname,email,session_id) VALUES ($1,$2,$3,$4,$5,$6)'
+                ,[user_name,hashed_password,first_name,last_name,user_email,session_id],(error, results_2)=>{
+                    if (error){
+                        console.log(error)
+                        req.send('Error!')
+                    }else{
+                        //Username: Roma_Number_1
+                        //Password: juvenumber1
+                        res.render('physician/loggedin',{
+                            docid:user_name,
+                            firstname:first_name.toUpperCase(),
+                            lastname:last_name.toUpperCase()
+                        })
                     }
-
-                doctor = new Doctor(first_name,last_name,user_name)
-                doctor.login_status = 1
-
-                res.render('physician/loggedin',{
-                            docid:doctor.doc_id,
-                            firstname:doctor.firstname,
-                            lastname:doctor.lastname
-                    })
                 })
             }
         }
@@ -81,117 +142,144 @@ router.post('/accountcreated',(req,res)=>{
 
 //table doc_reg
 //the login search feature, change it to 'POST' request
-router.post('/loggedin',(req,res)=>{
+router.post('/loggedin',async(req,res)=>{
     const {user_name_login,password_login} = req.body
-    const dbsearch_text = 'SELECT * FROM doc_reg WHERE username=$1 AND pw=$2'
-    const dbsearch_value= [user_name_login,password_login]
+    //convert password to hashed_version
+    let hashed_password = crypto.pbkdf2Sync(password_login, crypto_salt, 1000, 64, 'sha512').toString(`hex`);
+    const dbsearch_text = 'SELECT * FROM doc_reg WHERE username=$1 AND password=$2';
+    const dbsearch_value= [user_name_login,hashed_password];
     pool.query(dbsearch_text,dbsearch_value,(err,results)=>{
         if (err){
-            console.log(err)
+            console.log(err);
         }
-        const doc_info = results.rows[0]
+        const doc_info = results.rows[0];
         if(doc_info===undefined){
-            res.send("You have not registered yet")
+            res.send("You have not registered yet. Please create an account first");
         }else{
-            console.log(doc_info)
-            doctor = new Doctor (doc_info.firstname,doc_info.lastname,doc_info.username)
-            res.render('physician/loggedin',{
-                docid:doctor.doc_id,
-                firstname:doctor.firstname.toUpperCase(),
-                lastname:doctor.lastname.toUpperCase()
-            })
+            
+            let session_id = req.sessionID;
+            // console.log(session_id)
+            //update session_id in the database
+            const dbsession_update = 'UPDATE doc_reg SET session_id=$1 WHERE username=$2'
+            const dbsession_value = [session_id,doc_info.username]
+            try{
+                pool.query(dbsession_update,dbsession_value);
+                res.render('physician/loggedin',{
+                    docid:doc_info.username,
+                    firstname:doc_info.firstname.toUpperCase(),
+                    lastname:doc_info.lastname.toUpperCase()
+                });
+            }catch(error){
+                console.log(error)
+                res.send('Error occurs at Login.');
+            }
         }
     })
 })
+
+router.use(session_validation);
+router.get('/loggedin/200/new_patient', async (req,res)=>{
+    res.render('physician/newpatient',{doc_id:req.user_found.username})
+})
 /* COMPLETED */
 
-//patientlist table
-//a 'get' request, being directed to the page where a new patient can be created
 
-router.get('/loggedin/200/new_patient',(req,res)=>{
-    const copiedtext = 'SELECT * FROM doc_pat_list WHERE username = $1'
-    const copiedvalue = [doctor.doc_id]
+/* you can use a validation middleware in here */
+router.post('/loggedin/200/new_patient/patient_info',patient_unique_check,async (req,res)=>{
+    let doc_id = req.user_found.username;
+    const {patient_firstname, patient_lastname, patientid_1,patient_email,patient_birthday,}=req.body;
 
-    if (doctor==""){
-        res.send("Please log into your account.")
-    }else{
+    const dbcreate_text = "INSERT INTO pat_info (patient_firstname, patient_lastname,patient_id,doc_id,patient_email,birth_date) VALUES ($1, $2, $3, $4, $5, $6)";
+    const dbcreate_value=[patient_firstname, patient_lastname, patientid_1,doc_id,patient_email,patient_birthday];
+
+    const dbcreate_text_2 = "INSERT INTO doc_pat_list (username,patient_id) VALUES ($1, $2)";
+    const dbcreate_value_2 = [doc_id, patientid_1]
+
+    try{
         
-        pool.query('INSERT INTO doc_pat_list (username) VALUES($1)',[doctor.doc_id],(err)=>{
-            if(err){
-                console.log(err)
-            }
-        })
+        await pool.query(dbcreate_text,dbcreate_value); //INSERT data into the database
+        await pool.query(dbcreate_text_2,dbcreate_value_2);
 
-        pool.query(copiedtext,copiedvalue,(err,results)=>{
-            if(err){
-                console.log(err)
-            }else{
-                res.render('physician/newpatient',{doc_id:doctor.doc_id})
-            }
+        res.render("physician/patmenu",{
+            patientfirstname:patient_firstname,
+            patientlastname:patient_lastname,
+            patientage:patient_birthday
         })
+    }catch(error){
+        console.log('Error occurred.')
+        res.send('Error occured at patient info entry.')
     }
-})
-/* COMPLETED */
-
-router.post('/loggedin/200/new_patient/patient_info',(req,res)=>{
-    const doc_id = log_info //working
-    const {patientfirstname, patientlastname, patientage, patientid_1}=req.body
-    const dbcreate_text=
-    "INSERT INTO pat_info (patient_firstname, patient_lastname, patient_age, patient_id) VALUES ($1, $2, $3, $4)"
-    const dbcreate_value=[patientfirstname, patientlastname, patientage, patientid_1]
-    pool.query(dbcreate_text,dbcreate_value,(err,results)=>{
-        if(err){
-            console.log(err)
-        }else{
-            console.log(doc_id)
-            pool.query("UPDATE pat_info SET doc_id = $1 WHERE patient_id = $2",[doc_id,dbcreate_value[3]],(err,results)=>{
-                if(err){
-                    console.log(err)
-                }else{
-                    console.log(results)
-
-                    patient = new Patient(patientfirstname,patientlastname,patientid_1,patientage)
-                    res.render("physician/patmenu",{
-                        patientfirstname:patient.firstname,
-                        patientlastname:patient.lastname,
-                        patientage:patient.age
-                    })
-                }
-            })
-        }
-    })
 })
 
 //direct to patient search page when searching for existing patients
-router.get('/loggedin/200/patient_search',(req,res)=>{
-    const username=doctor.doc_id
-    const dbcommand = 'SELECT * FROM pat_info'
-    if(doctor===""){
-        res.send("Please log into your account, thank you! ")
-    }else{
-        pool.query(dbcommand,(err,results)=>{
-            if(err){
-                console.log(err)
-            }else{
-                // console.log(results.rows) //will be shown once getting into extpatient page
-                res.render('physician/extpatient',{
-                    doc_id:username
-                })
-            }
+router.get('/loggedin/200/patient_search',session_validation,async (req,res)=>{
+    let doc_id = req.user_found.username;
+    let doc_lastname = req.user_found.lastname;
+    const dbsearch_text = 'SELECT * FROM doc_pat_list WHERE username = $1'
+    const dbsearch_value = [doc_id]
+    try{
+        let result_found =  await pool.query(dbsearch_text,dbsearch_value);
+        // console.log(result_found.rows);
+        let patients_list = result_found.rows;
+        
+        /* 
+        13 patients in total, 5 per page, 3 pages needed, 
+
+        13%4 = 1
+
+        first do this: (13-(13%5)) 
+        if (%4===0) --> no need to add a page
+        else if (%4!==0) --> add a page
+        */
+
+        let pages = (patients_list.length-patients_list.length%5)/5
+        let list_to_be_displayed = patients_list.slice(0*5,0*5+5);
+        if(patients_list.length%5!==0){
+            pages = pages+1
+        }
+
+
+        res.render('physician/extpatient',{
+            doc_id:doc_lastname,
+            list_tobe_displayed:list_to_be_displayed,
+            page_num:pages
         })
+
+    }catch(error){
+        console.log(error);
+        res.send('Error occured at searching for existing patients.')
     }
+    
 })
-/* COMPLETED */
 
+//Pagination
+router.get('/loggedin/200/anchor/:page',pagination_validation,async (req,res)=>{
 
-/*  */
-router.get('/loggedin/200/patient_search/patients_ii',(req,res)=>{
-    res.render('physician/patmenu',{
-        patientlastname:patient.lastname,
-        patientfirstname:patient.firstname,
-        patientage:patient.age
+    let page_num  = req.params.page;
+    let doc_lastname = req.user_found.lastname;
+    /* 
+        Page 0, 0-4,   from k*5 to k*5+5
+        Page 1, 5-9,    from k*5 to k*5+5
+        Page 2, 10-14    from k*5 to k*5+5
+    */
+    console.log('You are on page: '+page_num);
+    let list_to_be_displayed = req.patients_list.slice(page_num*5,page_num*5+5);
+    let patients_list = req.patients_list;
+
+    let pages = (patients_list.length-patients_list.length%5)/5
+
+    if(patients_list.length%5!==0){
+        pages = pages+1
+    }
+
+    res.render('physician/extpatient',{
+        doc_id:doc_lastname,
+        list_tobe_displayed:list_to_be_displayed,
+        page_num:pages,
     })
+    
 })
+
 
 router.post('/loggedin/200/patient_search/patients_ii',(req,res)=>{
     const {patient_lastname,patient_firstname,patient_id}=req.body
@@ -201,22 +289,14 @@ router.post('/loggedin/200/patient_search/patients_ii',(req,res)=>{
         if(err){
             console.log(err)
         }else{
-            // console.log(results.rows)
+            
             const pat_info = results.rows[0]
             if(pat_info===undefined){
-                res.send("This patient is not in the database")
+                res.send("This patient is not in the database.")
             }else{
-                patient = new Patient (
-                    pat_info.patient_firstname,
-                    pat_info.patient_lastname,
-                    pat_info.patient_id,
-                    pat_info.patient_age
-                )
-                // console.log(patient_cursor)
                 res.render('physician/patmenu',{
-                    patientlastname:patient.lastname,
-                    patientfirstname:patient.firstname,
-                    patientage:patient.age
+                    patientlastname:pat_info.lastname,
+                    patientfirstname:pat_info.firstname,
                 })
             }
         }
@@ -224,27 +304,22 @@ router.post('/loggedin/200/patient_search/patients_ii',(req,res)=>{
 })
 
 //routes to creating or updating diagnosis (urologist)
-let id_serie = ''
-router.get('/loggedin/200/patient_search/patients_ii/new_record',(req,res)=>{
-    if(doctor===""||patient===""){
-        res.send("Please log into your account.")
-    }else{
 
-        let record_id = new Date()
-        const a = record_id.getFullYear().toString()
-        const b = record_id.getMonth().toString()
-        const c = record_id.getDate().toString()
-        const d = record_id.getHours().toString()
-        const e = record_id.getMinutes().toString()
-        id_serie = a.concat(b).concat(c).concat(d).concat(e)
-        timeline = a.concat('/').concat(b).concat('/').concat(c).concat(' ').concat(d).concat(':').concat(e)
+router.get('/loggedin/200/patient_search/patients_ii/new_record/',(req,res)=>{
 
+    let record_id = new Date()
+    let a = record_id.getFullYear().toString()
+    let b = record_id.getMonth().toString()
+    let c = record_id.getDate().toString()
+    let d = record_id.getHours().toString()
+    let e = record_id.getMinutes().toString()
+    let id_serie = a.concat(b).concat(c).concat(d).concat(e)
 
-        // console.log(id_serie)
-        res.render('physician/newrecord',{
+    console.log(req.user_found.lastname);
+
+    res.render('physician/newrecord',{
             record_id:id_serie
-        })
-    }
+    })
 })
 
 router.post('/loggedin/200/patient_search/diagnosiscreated',(req,res)=>{
@@ -398,6 +473,6 @@ router.get('/loggedin_search/:search',(req,res)=>{
             }
         }
     })
-})
+});
 
-module.exports=router
+module.exports = router;

@@ -11,14 +11,22 @@
     //type in --> number goes down
         function wordCount(){
             let limit = 25;
-            const word_count = document.getElementById('user_name')
-            const word_length = word_count.value.length
-            word_count.addEventListener('keydown',()=>{
+            const word_count = document.getElementById('user_name');
+            const word_length = word_count.value.length;
+            word_count.addEventListener('keyup',()=>{
                 let count_text = document.querySelector('.word-count')
                 if(word_length===0){
-                    count_text.innerHTML = null
+                    count_text.style.color = 'black';
+                    count_text.style.fontWeight = 'normal';
+                    count_text.innerHTML = 'Remaining characters: 25'
+                }else if(word_length>0&&word_length<=25){
+                    count_text.style.color = 'black';
+                    count_text.style.fontWeight = 'normal';
+                    count_text.innerHTML = 'Remaining characters: '+(limit-word_length).toString();
                 }else{
-                    count_text.innerHTML = (limit-word_length).toString()
+                    count_text.style.color = 'red';
+                    count_text.style.fontWeight = 'bold';
+                    count_text.innerHTML = 'CHARACTER LIMIT REACHED';
                 }
             })
         }
@@ -32,7 +40,6 @@
             const password_2 = document.getElementById('password_2').value
 
     //we will leave the creating password part later, because it is such a pain in the ass
-
             if (user_name==="" || user_email==="" || first_name==="" || last_name===""|| password_1===""|| password_2===""){
                 alert("Information Missing for Required Entries")
                 console.log("1 Worked!")
@@ -48,7 +55,6 @@
         function loginValidation (){
             const user_name = document.getElementById('user_name_login').value
             const password = document.getElementById('password_login').value
-
             if (user_name===""|| password===""){
                 console.log("2 Worked!")
                 alert("Login Information Missing")
@@ -59,7 +65,6 @@
 </head>
 
 <body>
-
     <h1>Doctor</h1>
     <!--physician route-->
     <div id='reg-log'>
@@ -67,12 +72,10 @@
         <h3>Registration</h3>
         <div class='form-container'>
             <form class='fillin-form'method='POST'onsubmit="return registerValidation()"action="/physician/accountcreated">
-                
                 <label>Username:</label>
                 <p class='word-count'></p>
                 <input type="text" id="user_name"oninput='wordCount()'name="user_name">
                 
-
                 <label>Email:</label>
                 <input type="email" id="user_email"oninput='wordCount()'name="user_email">
                 <label>Type in First Name:</label>
@@ -80,9 +83,9 @@
                 <label>Type in Last Name:</label>
                 <input type="text" id="last_name"oninput='wordCount()'name="last_name">
                 <label>Create your password:</label>
-                <input type="text" id='password_1'oninput='wordCount()'name='password_1'>
+                <input type="password" id='password_1'oninput='wordCount()'name='password_1'>
                 <label>Confirm your password:</label>
-                <input type="text" id='password_2'oninput='wordCount()'name='password_2'>
+                <input type="password" id='password_2'oninput='wordCount()'name='password_2'>
                 <button type="submit">Register</button>
             </form>
         </div>
@@ -96,7 +99,7 @@
                 <label>Username:</label>
                 <input type='text'id='user_name_login'name='user_name_login'>
                 <label>Password:</label>
-                <input type='text'id='password_login'name='password_login'>
+                <input type='password'id='password_login'name='password_login'>
                 <button type="submit">Login</button>
             </form>
         </div>

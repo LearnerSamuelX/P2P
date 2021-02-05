@@ -8,12 +8,12 @@
 </head>
 <body>
     <div id="doc-id">
-        <h3>Dr. <%= docid %> <%= lastname %>, <%= firstname %></h3>
+        <p>Dr.<%= lastname %>, <%= firstname %></p>
+        <p>User ID: <%= docid %> </p>
     </div>
     <div id='selection-container'>
-        <a href="loggedin/200/new_patient">New Patient</a>
-        <a href="loggedin/200/patient_search">Existing Patient</a>
+        <a href="/physician/loggedin/200/new_patient">New Patient</a>
+        <a href="/physician/loggedin/200/patient_search">Existing Patient</a>
     </div>
-
 </body>
 </html>

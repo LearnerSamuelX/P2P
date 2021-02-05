@@ -19,16 +19,20 @@
             <button type='submit'>Search</button>
         </form>
     </div>
-    <div id='search-display'>
-        <h1>Search Display</h1>
-        <!--The search results are shown here-->
-    </div>
+
     <div id='recent-panel'>
         <!--Down below display the list of existing patients-->
         <div id='record-container'>
-            <h1>Record</h1>
-            <div id='record-column'>
-                Here will see the recent records, up to 5
+            <h1>Dr.<%= doc_id%>'s Patient List</h1>
+            <div id='patient-list'>
+                <%list_tobe_displayed.forEach((i)=>{%>
+                    <a href='/physician/loggedin/200/patient_search/<%=i.patient_id%>'><%= i.patient_id %></a>
+                <%})%>
+            </div>
+            <div id='page-numbers'>
+                <% for(let i=0;i<page_num;i++){%>
+                    <a href='/physician/loggedin/200/anchor/<%=i%>'><%=i%></a>
+                <% } %>
             </div>
         </div>
     </div>

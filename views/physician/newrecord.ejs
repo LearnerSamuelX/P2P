@@ -5,34 +5,30 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="/stylesheets/physician/newrecord.css">
     <title>New Patient Report</title>
-    <script>
-        function redLine(){
-            const psa = document.getElementById('psa-index')
-            if(psa.value===""||psa.value<4.1){
-                psa.style.color='black'
-            }
-
-            else if (psa.value>=4.1){
-                psa.style.color = 'red'
-            }
-        }
-
-        function characterLimit() {
-            var textEntered = document.getElementById('dia_summary').value
-            var characterCount = textEntered.length
-            var characterRemained = 300-characterCount
-            document.getElementById('word_count').innerHTML = characterRemained.toString()
-        }      
-    </script>
 </head>
 <body>
-    <!--Create an inclue tag, so that you dont have to repetively create patient's name-->
-    <!--<%include %> Figure out this later--> 
     <div id='date-time'>
         <p id='date-time-text'></p>
     </div>
+
+    <div id='chat-UI'>
+        <div id='chat-screen'>
+        </div>
+        <div id=chat-input>
+            <input id='chat-typing'type='text'></input>
+            <div id='chat-submit'>Submit</div>
+        </div>
+
+        <div id='chat-button'>
+            <p>Chat Bar</p>
+        </div>
+    </div>
+    
+
+    <div id='camera-container'>
+    </div>
+
     <div id='form-container'>
-        
         <form id='form-body'method="POST"action="/physician/loggedin/200/patient_search/diagnosiscreated">
             <label>File ID:</label>
             <p id='file_id'name='file_id'><%=record_id%></p>
@@ -52,5 +48,29 @@
             <button type="submit">Create a Record</button>
         </form>
     </div>
+
+    <script src="/socket.io/socket.io.js"></script>
+    <script>
+
+        const chat_bar = document.getElementById('chat-button');
+        const chat_screen = document.getElementById('chat-screen');
+        const chat_typing = document.getElementById('chat-typing');
+        const chat_submit = document.getElementById('chat-submit')
+
+        chat_bar.addEventListener('click',()=>{
+            if(chat_screen.style.display==='none'){
+                chat_screen.style.display = 'block';
+                chat_typing.style.display = 'block';
+                chat_submit.style.display = 'block';
+            }else{
+                chat_screen.style.display = 'none';
+                chat_typing.style.display = 'none';
+                chat_submit.style.display = 'none';
+            }
+        })
+
+        var socket = io(); 
+        socket.emit('entry',data);
+    </script>
 </body>
 </html>

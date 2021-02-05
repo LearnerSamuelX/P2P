@@ -1,6 +1,7 @@
-#doc-id h3{
-    text-align: center;
+#doc-id p{
+    text-align:center;
 }
+
 
 #selection-container{
     display:flex;

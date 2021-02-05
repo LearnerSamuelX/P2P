@@ -29,3 +29,45 @@
     margin-left:auto;
     margin-right:auto;
 }
+
+#record-container h1{
+    text-align: center;
+}
+
+#record-container p{
+    text-align: center;
+}
+
+#patient-list{
+    display: flex;
+    flex-direction: column;
+    text-align: center;
+    width:10rem;
+    margin:auto auto;
+}
+
+#patient-list a{
+    margin-top:0.5rem;
+    margin-bottom:0.5rem;
+    text-decoration: none;
+    color:black;
+    text-align: left;
+
+}
+
+#page-numbers{
+    border: 5px solid red;
+    width:5rem;
+    margin-top:0.5rem;
+    margin-left:auto;
+    margin-right:auto;
+    display: flex;
+    flex-direction: row;
+}
+
+#page-numbers a{
+    text-decoration: none;
+    font-weight: bold;
+    border: 5px solid rgb(60, 255, 0);
+    margin:0;
+}

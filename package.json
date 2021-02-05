@@ -15,12 +15,15 @@
     "ejs": "^3.1.2",
     "express": "^4.17.1",
     "express-ejs-layouts": "^2.5.0",
+    "express-session": "^1.17.1",
     "init": "^0.1.2",
     "node-cron": "^2.0.3",
     "nodemailer": "^6.4.6",
-    "pg": "^8.1.0"
+    "pg": "^8.1.0",
+    "socket.io": "^3.1.0",
+    "uuid": "^8.3.2"
   },
   "devDependencies": {
-    "nodemon": "^2.0.3"
+    "nodemon": "^2.0.7"
   }
 }
